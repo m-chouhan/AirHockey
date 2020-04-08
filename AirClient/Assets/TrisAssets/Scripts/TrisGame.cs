@@ -1,6 +1,4 @@
 using UnityEngine;
-using System;
-using System.Collections;
 using Sfs2X;
 using Sfs2X.Core;
 using Sfs2X.Requests;

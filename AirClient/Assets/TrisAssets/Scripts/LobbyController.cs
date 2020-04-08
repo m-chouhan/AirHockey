@@ -29,11 +29,6 @@ public class LobbyController : MonoBehaviour {
 	private const string EXTENSION_ID = "Tris";
 	private const string EXTENSION_CLASS = "sfs2x.extensions.games.tris.TrisExtension";
 
-	// Comment above EXTENSION_ID and EXTENSION_CLASS constants and
-	// uncomment the following to use the JavaScript version of the Tris Extension
-	//private const string EXTENSION_ID = "Tris-JS";
-	//private const string EXTENSION_CLASS = "TrisExtension.js";
-
 	private SmartFox sfs;
 	private bool shuttingDown;
 
