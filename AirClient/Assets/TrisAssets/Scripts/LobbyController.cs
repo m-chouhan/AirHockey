@@ -1,13 +1,9 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using Sfs2X;
-using Sfs2X.Logging;
-using Sfs2X.Util;
 using Sfs2X.Core;
 using Sfs2X.Entities;
 using Sfs2X.Requests;
@@ -26,8 +22,8 @@ public class LobbyController : MonoBehaviour {
 	// Private properties
 	//----------------------------------------------------------
 
-	private const string EXTENSION_ID = "Tris";
-	private const string EXTENSION_CLASS = "sfs2x.extensions.games.tris.TrisExtension";
+	private const string EXTENSION_ID = "AirHockey";
+	private const string EXTENSION_CLASS = "com.airhockey.AirHockeyExtension";
 
 	private SmartFox sfs;
 	private bool shuttingDown;
@@ -93,7 +89,7 @@ public class LobbyController : MonoBehaviour {
 	public void OnStartNewGameButtonClick() {
 		// Configure Game Room
 		RoomSettings settings = new RoomSettings(sfs.MySelf.Name + "'s game");
-		settings.GroupId = "games";
+		settings.GroupId = "default";
 		settings.IsGame = true;
 		settings.MaxUsers = 2;
 		settings.MaxSpectators = 0;
@@ -161,16 +157,13 @@ public class LobbyController : MonoBehaviour {
 	
 	private void OnRoomJoin(BaseEvent evt) {
 		Room room = (Room) evt.Params["room"];
-
 		// If we joined a Game Room, then we either created it (and auto joined) or manually selected a game to join
 		if (room.IsGame) {
 			// Remove SFS2X listeners
 			reset ();
 			// Load game scene
-			SceneManager.LoadScene("Game");
-		} else {
-            printSystemMessage("No game room available!!");
-		}
+			SceneManager.LoadScene("AirHockey");
+		} 
 	}
 	
 	private void OnRoomJoinError(BaseEvent evt) {

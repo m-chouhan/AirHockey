@@ -4,33 +4,42 @@ using Sfs2X.Core;
 using Sfs2X.Requests;
 using Sfs2X.Entities.Data;
 using System;
+using UnityEngine.SceneManagement;
 
 public class AirHockeyController : MonoBehaviour
 {
     private SmartFox sfs;
     private int playerId;
 
-    // Start is called before the first frame update
     void Start()
     {
-
+        Application.runInBackground = true;
+        if (SmartFoxConnection.IsInitialized)
+        {
+            sfs = SmartFoxConnection.Connection;
+            InitGame();
+        }
+        else
+        {
+            //no point starting the game, need to relogin
+            SceneManager.LoadScene("Login");
+            return;
+        }
     }
 
-    // Update is called once per frame
     void Update()
     {
 
     }
 
-    public void InitGame(SmartFox smartFox)
+    public void InitGame()
     {
-        sfs = smartFox;
         sfs.AddEventListener(SFSEvent.EXTENSION_RESPONSE, OnExtensionResponse);
-
         // Setup my properties
         playerId = sfs.MySelf.PlayerId;
-
-        sfs.Send(new ExtensionRequest("ready", new SFSObject(), sfs.LastJoinedRoom));
+        SFSObject payload = new SFSObject();
+        payload.PutInt("a", 10); payload.PutInt("b", 20);
+        sfs.Send(new ExtensionRequest("ready", payload, sfs.LastJoinedRoom));
     }
 
     private void OnExtensionResponse(BaseEvent evt)

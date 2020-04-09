@@ -21,7 +21,7 @@ public class LoginController : MonoBehaviour {
 	public int WSPort = 8080;
 
 	[Tooltip("Name of the SmartFoxServer 2X Zone to join")]
-	public string Zone = "BasicExamples";
+	public string Zone = "AirHockey";
 
 	//----------------------------------------------------------
 	// UI elements
