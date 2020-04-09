@@ -99,7 +99,7 @@ public class TrisExtension extends SFSExtension
 		resObj.putInt("p1i", player1.getId());
 		resObj.putUtfString("p2n", player2.getName());
 		resObj.putInt("p2i", player2.getId());
-		
+		trace("Starting new game");
 		send("start", resObj, getParentRoom().getUserList());
 	}
 	

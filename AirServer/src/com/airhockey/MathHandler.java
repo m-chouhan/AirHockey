@@ -6,13 +6,14 @@ import com.smartfoxserver.v2.entities.data.SFSObject;
 import com.smartfoxserver.v2.extensions.BaseClientRequestHandler;
 
 public class MathHandler extends BaseClientRequestHandler {
+
     @Override
     public void handleClientRequest(User user, ISFSObject params) {
+
         int a = params.getInt("a");
         int b = params.getInt("b");
-
-        ISFSObject returnVal = new SFSObject();
-        returnVal.putInt("sum", a+b);
-        getParentExtension().send("start", returnVal, user);
+        trace("mahendra in MathHandler, a = " + a + ", b = " + b);
+        AirHockeyExtension airHockeyExtension = (AirHockeyExtension) getParentExtension();
+        airHockeyExtension.startGame();
     }
 }

@@ -24,8 +24,9 @@ public class LobbyController : MonoBehaviour {
 
 	private const string EXTENSION_ID = "AirHockey";
 	private const string EXTENSION_CLASS = "com.airhockey.AirHockeyExtension";
+    //private const string EXTENSION_CLASS = "sfs2x.extensions.games.tris.TrisExtension";
 
-	private SmartFox sfs;
+    private SmartFox sfs;
 	private bool shuttingDown;
 
 	//----------------------------------------------------------

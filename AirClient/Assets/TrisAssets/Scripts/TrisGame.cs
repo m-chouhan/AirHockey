@@ -178,7 +178,8 @@ public class TrisGame {
 	 * Handle responses from server side Extension.
 	 */
 	public void OnExtensionResponse(BaseEvent evt) {
-		string cmd = (string)evt.Params["cmd"];
+        Debug.Log("On Ext response 2");
+        string cmd = (string)evt.Params["cmd"];
 		SFSObject dataObject = (SFSObject)evt.Params["params"];
 		
 		switch ( cmd ) {

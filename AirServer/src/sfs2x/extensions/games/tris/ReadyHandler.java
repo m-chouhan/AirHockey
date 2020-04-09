@@ -9,6 +9,7 @@ public class ReadyHandler extends BaseClientRequestHandler
 	@Override
 	public void handleClientRequest(User user, ISFSObject params)
 	{
+		trace("Tris Ready Handler Started");
 		TrisExtension gameExt = (TrisExtension) getParentExtension();
 		
 		if (user.isPlayer())
