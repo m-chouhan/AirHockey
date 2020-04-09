@@ -1,9 +1,6 @@
 package sfs2x.extensions.games.spacewar;
 
-import java.io.File;
 import java.io.IOException;
-
-import org.apache.commons.io.FileUtils;
 
 import sfs2x.extensions.games.spacewar.evthandlers.LoginEventHandler;
 
@@ -86,7 +83,7 @@ public class SpaceWarZoneExtension extends SFSExtension
 	private void setupGame() throws IOException
 	{
 		// Load configuration file
-		String cfgData = FileUtils.readFileToString(new File(this.getCurrentFolder() + "SpaceWar.cfg"));
+		String cfgData = "";//FileUtils.readFileToString(new File(this.getCurrentFolder() + "SpaceWar.cfg"));
 		
 		// Convert to temporary SFSObject
 		ISFSObject tempCfg = SFSObject.newFromJsonData(cfgData);

@@ -9,11 +9,12 @@ public class AirHockeyExtension extends SFSExtension {
     @Override
     public void init() {
         trace("mahendra in init");
-        this.addRequestHandler("ready", MathHandler.class);
+        this.addRequestHandler("ready", ReadyHandler.class);
     }
 
     void startGame() {
         ISFSObject resObj = new SFSObject();
+        resObj.putSFSObject();
         resObj.putInt("sum", 100);
         send("start", resObj, getParentRoom().getUserList());
     }
