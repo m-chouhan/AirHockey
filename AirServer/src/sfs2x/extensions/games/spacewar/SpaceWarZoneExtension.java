@@ -2,13 +2,12 @@ package sfs2x.extensions.games.spacewar;
 
 import java.io.IOException;
 
-import sfs2x.extensions.games.spacewar.evthandlers.LoginEventHandler;
-
 import com.smartfoxserver.v2.core.SFSEventType;
 import com.smartfoxserver.v2.entities.data.ISFSArray;
 import com.smartfoxserver.v2.entities.data.ISFSObject;
 import com.smartfoxserver.v2.entities.data.SFSObject;
 import com.smartfoxserver.v2.extensions.SFSExtension;
+//import sfs2x.extensions.games.spacewar.evthandlers.LoginEventHandler;
 
 public class SpaceWarZoneExtension extends SFSExtension
 {
@@ -26,7 +25,7 @@ public class SpaceWarZoneExtension extends SFSExtension
 			setupGame();
 			
 			// Add listener to send the list of available starship models to the user upon login
-			addEventHandler(SFSEventType.USER_LOGIN, LoginEventHandler.class);
+			//addEventHandler(SFSEventType.USER_LOGIN, LoginEventHandler.class);
 		}
 		catch (IOException e)
 		{

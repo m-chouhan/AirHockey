@@ -12,7 +12,7 @@ public class ReadyHandler extends BaseClientRequestHandler {
 
         trace("in Ready Handler");
         AirHockeyExtension airHockeyExtension = (AirHockeyExtension) getParentExtension();
-        if(airHockeyExtension.getParentRoom().getUserList().size() == 2)
+        if(airHockeyExtension.getParentRoom().getUserList().size() == 1)
             airHockeyExtension.startGame();
     }
 }
