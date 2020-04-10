@@ -10,9 +10,9 @@ public class ReadyHandler extends BaseClientRequestHandler {
     @Override
     public void handleClientRequest(User user, ISFSObject params) {
 
-        trace("in Ready Handler");
+        trace("Player : " + user.getId() + " in Ready Handler");
         AirHockeyExtension airHockeyExtension = (AirHockeyExtension) getParentExtension();
-        if(airHockeyExtension.getParentRoom().getUserList().size() == 1)
+        if(airHockeyExtension.getParentRoom().getUserList().size() == 2)
             airHockeyExtension.startGame();
     }
 }

@@ -89,7 +89,7 @@ public class AirHockeyController : MonoBehaviour
     public void OnExtensionResponse(BaseEvent evt)
     {
         string cmd = (string)evt.Params["cmd"];
-        Debug.Log("On extension response received" + cmd);
+        Debug.Log("ext response : " + cmd);
 
         SFSObject dataObject = (SFSObject)evt.Params["params"];
 
