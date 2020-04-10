@@ -11,10 +11,15 @@ public class AirHockeyController : MonoBehaviour
     private SmartFox sfs;
     public GameObject playerPrefab;
 
-    private GameObject player1, player2;
-
+    private Player current, other;
+    public static AirHockeyController Instance;
     void Awake()
     {
+        if (Instance == null)
+            Instance = this;
+        else if (Instance != this)
+            Destroy(gameObject);
+
         Application.runInBackground = true;
         if (SmartFoxConnection.IsInitialized)
         {
@@ -44,10 +49,6 @@ public class AirHockeyController : MonoBehaviour
         sfs.AddEventListener(SFSEvent.USER_ENTER_ROOM, OnUserEnterRoom);
         sfs.AddEventListener(SFSEvent.USER_EXIT_ROOM, OnUserExitRoom);
         sfs.AddEventListener(SFSEvent.EXTENSION_RESPONSE, OnExtensionResponse);
-
-        // Setup my properties
-        player1 = Instantiate(playerPrefab, new Vector3(-1.5f,0,0), Quaternion.identity);
-        player1.GetComponent<Player>().user = sfs.MySelf;
 
         SFSObject payload = new SFSObject();
         sfs.Send(new ExtensionRequest("ready", payload, sfs.LastJoinedRoom));
@@ -87,15 +88,35 @@ public class AirHockeyController : MonoBehaviour
 
     public void OnExtensionResponse(BaseEvent evt)
     {
-        Debug.Log("On extension response");
         string cmd = (string)evt.Params["cmd"];
+        Debug.Log("On extension response received" + cmd);
+
         SFSObject dataObject = (SFSObject)evt.Params["params"];
-        Debug.Log(dataObject);
+
         switch(cmd) {
             case "start":
+                // Setup my properties
+                GameObject player1 = Instantiate(playerPrefab);
+                GameObject player2 = Instantiate(playerPrefab);
+                Player p1 = player1.GetComponent<Player>();
+                Player p2 = player2.GetComponent<Player>();
+                p1.ParseData(dataObject.GetSFSObject("p1"));
+                p2.ParseData(dataObject.GetSFSObject("p2"));
+                current = sfs.MySelf.Id == p1.id ? p1 : p2;
+                other = sfs.MySelf.Id == p1.id ? p2 : p1;
+                current.EnableTouch();
+                break;
+            case "move":
+                other.ParseData(dataObject.GetSFSObject(other.id.ToString()));
+                //hockeyPuck.parseData(dataObject.GetSFSObject("hockeyPuck"));
+                break;
             case "stop":
                 break;
          }
+    }
+
+    public void UpdatePlayerPosition(Player player) {
+        sfs.Send(new ExtensionRequest("move", player.ToSFS(), sfs.LastJoinedRoom));
     }
 
     private void reset()
