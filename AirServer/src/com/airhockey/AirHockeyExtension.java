@@ -1,12 +1,9 @@
 package com.airhockey;
 
-import com.airhockey.entities.Player;
-import com.airhockey.entities.Puck;
 import com.airhockey.handlers.MovementHandler;
 import com.airhockey.handlers.ReadyHandler;
 import com.smartfoxserver.v2.SmartFoxServer;
 import com.smartfoxserver.v2.entities.User;
-import com.smartfoxserver.v2.entities.data.ISFSObject;
 import com.smartfoxserver.v2.entities.data.SFSObject;
 import com.smartfoxserver.v2.extensions.SFSExtension;
 
@@ -32,7 +29,7 @@ public class AirHockeyExtension extends SFSExtension {
         List<User> userList = getParentRoom().getUserList();
         game = new CoreGame(this, userList.get(0), null);
         // Schedule task: executes the game logic on the same frame basis (25 fps) used by the Flash client
-        gameTask = sfs.getTaskScheduler().scheduleAtFixedRate(game, 0, 400, TimeUnit.MILLISECONDS);
+        gameTask = sfs.getTaskScheduler().scheduleAtFixedRate(game, 0, 500, TimeUnit.MILLISECONDS);
 
         List<Integer> userIds = userList.stream().map(User::getId).collect(Collectors.toList());
         userIds.add(100);

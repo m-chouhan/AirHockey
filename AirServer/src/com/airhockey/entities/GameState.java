@@ -7,10 +7,10 @@ import com.smartfoxserver.v2.entities.data.SFSObject;
  * basically our Game is F of (class Game)
  */
 public class GameState implements SFSInterface {
-    Player player1, player2;
-    Puck puck;
+    public Player player1, player2;
+    public Circle puck;
 
-    public GameState(Player p1, Player p2, Puck puck) {
+    public GameState(Player p1, Player p2, Circle puck) {
         this.player1 = p1;
         this.player2 = p2;
         this.puck = puck;
@@ -26,5 +26,10 @@ public class GameState implements SFSInterface {
         out.putSFSObject(String.valueOf(player2.id), player2.toSfs());
         out.putSFSObject("puck", puck.toSfs());
         return out;
+    }
+
+    @Override
+    public String toString() {
+        return "P1 : " + player1.toString() + ", P2 : " + player2.toString() + ", Puck : " + puck.toString();
     }
 }

@@ -2,36 +2,36 @@ package com.airhockey.entities;
 
 import com.smartfoxserver.v2.entities.data.SFSObject;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.World;
 
-public class Player implements SFSInterface {
-
-    Vec2 position = new Vec2();
-    Vec2 velocity = new Vec2();
+public class Player extends Circle {
 
     int id;
     int score;
 
-    public Player(int id, float x, float y, int score) {
+    public Player(World world, int id, float radius, float x, float y, int score) {
+        super(world, radius, x, y);
         this.id = id;
-        position.x = x;
-        position.y = y;
         this.score = score;
     }
 
     @Override
     public void fromSfs(SFSObject sfsObject) {
+        super.fromSfs(sfsObject);
         this.id = sfsObject.getInt("id");
-        position.x = sfsObject.getFloat("x");
-        position.y = sfsObject.getFloat("y");
         this.score = sfsObject.getInt("score");
     }
 
     @Override
     public SFSObject toSfs() {
-        SFSObject sfsObject = new SFSObject();
+        SFSObject sfsObject = super.toSfs();
         sfsObject.putInt("id", id);
-        sfsObject.putFloat("x", position.x);
-        sfsObject.putFloat("y", position.y);
         return sfsObject;
+    }
+
+    @Override
+    public String toString() {
+        return "{ id " + id +", "+ getPosition().toString() + ", " + score + " }";
     }
 }

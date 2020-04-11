@@ -106,7 +106,8 @@ public class AirHockeyController : MonoBehaviour
                 puck = puckGO.GetComponent<Puck>();
 
                 current.ParseData(dataObject.GetSFSObject(sfs.MySelf.Id.ToString()));
-                foreach (int uid in dataObject.GetIntArray("userIds")) {
+                int[] uids = dataObject.GetIntArray("userIds");
+                foreach (int uid in uids) {
                     if (uid != sfs.MySelf.Id)
                         other.ParseData(dataObject.GetSFSObject(uid.ToString()));
                 }
