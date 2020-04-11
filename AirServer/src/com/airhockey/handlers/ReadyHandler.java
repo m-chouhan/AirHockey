@@ -1,5 +1,6 @@
-package com.airhockey;
+package com.airhockey.handlers;
 
+import com.airhockey.AirHockeyExtension;
 import com.smartfoxserver.v2.entities.User;
 import com.smartfoxserver.v2.entities.data.ISFSObject;
 import com.smartfoxserver.v2.entities.data.SFSObject;
@@ -12,7 +13,7 @@ public class ReadyHandler extends BaseClientRequestHandler {
 
         trace("Player : " + user.getId() + " in Ready Handler");
         AirHockeyExtension airHockeyExtension = (AirHockeyExtension) getParentExtension();
-        if(airHockeyExtension.getParentRoom().getUserList().size() == 2)
+        if(airHockeyExtension.getParentRoom().getUserList().size() == 1)
             airHockeyExtension.startGame();
     }
 }

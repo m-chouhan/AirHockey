@@ -10,8 +10,11 @@ public class AirHockeyController : MonoBehaviour
 {
     private SmartFox sfs;
     public GameObject playerPrefab;
+    public GameObject puckPrefab;
 
     private Player current, other;
+    private Puck puck;
+
     public static AirHockeyController Instance;
     void Awake()
     {
@@ -90,25 +93,33 @@ public class AirHockeyController : MonoBehaviour
     {
         string cmd = (string)evt.Params["cmd"];
         Debug.Log("ext response : " + cmd);
-
         SFSObject dataObject = (SFSObject)evt.Params["params"];
 
-        switch(cmd) {
+        switch (cmd) {
             case "start":
                 // Setup my properties
                 GameObject player1 = Instantiate(playerPrefab);
                 GameObject player2 = Instantiate(playerPrefab);
-                Player p1 = player1.GetComponent<Player>();
-                Player p2 = player2.GetComponent<Player>();
-                p1.ParseData(dataObject.GetSFSObject("p1"));
-                p2.ParseData(dataObject.GetSFSObject("p2"));
-                current = sfs.MySelf.Id == p1.id ? p1 : p2;
-                other = sfs.MySelf.Id == p1.id ? p2 : p1;
+                GameObject puckGO = Instantiate(puckPrefab);
+                current = player1.GetComponent<Player>();
+                other = player2.GetComponent<Player>();
+                puck = puckGO.GetComponent<Puck>();
+
+                current.ParseData(dataObject.GetSFSObject(sfs.MySelf.Id.ToString()));
+                foreach (int uid in dataObject.GetIntArray("userIds")) {
+                    if (uid != sfs.MySelf.Id)
+                        other.ParseData(dataObject.GetSFSObject(uid.ToString()));
+                }
+                puck.ParseData(dataObject.GetSFSObject("puck"));
+
                 current.EnableTouch();
+                current.gameObject.name = "me";
+                other.gameObject.name = "other";
+                puck.gameObject.name = "puck";
                 break;
             case "move":
                 other.ParseData(dataObject.GetSFSObject(other.id.ToString()));
-                //hockeyPuck.parseData(dataObject.GetSFSObject("hockeyPuck"));
+                puck.ParseData(dataObject.GetSFSObject("puck"));
                 break;
             case "stop":
                 break;

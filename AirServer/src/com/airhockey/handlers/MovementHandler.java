@@ -1,4 +1,4 @@
-package com.airhockey;
+package com.airhockey.handlers;
 
 import com.smartfoxserver.v2.entities.User;
 import com.smartfoxserver.v2.entities.data.ISFSObject;
