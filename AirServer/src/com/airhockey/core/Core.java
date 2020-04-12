@@ -20,21 +20,22 @@ public class Core implements Runnable {
     final World myWorld;
 
     //game constants
-    final float TimeStep = 0.1f;
+    final float TimeStep = 0.01f;
     final int VelocityIterations = 10, PositionIterations = 8;
     final SFSExtension EXT;
 
     public Core(SFSExtension ext, User user1, User user2) {
         ext.trace("core game init!!");
-        Vec2 gravity = new Vec2(0,0);
-        myWorld = new Engine(this, 1.5f,0.6f);
-        Player player1 = new Player(user1.getId(), 0.2f, -1, 0,  0);
-        Player player2 = new Player( 100, 0.2f,1, 0, 0);
-        Circle puck = new Circle(0.2f,-0.5f,0);
+        Player player1 = new Player(user1.getId(), 0.12f, -1, 0,  0);
+        Player player2 = new Player( 100, 0.12f,1, 0, 0);
+        Circle puck = new Circle(0.12f,-0.5f,0, 1);
         //Boundary boundary = new Boundary(myWorld, 0, -1, 10, 1);
-        puck.setVelocity(1f, 0.2f);
+        puck.setVelocity(1f, 0f);
+        //player1.setVelocity(0.1f,0.1f);
+        //player2.setVelocity(0.1f,0.1f);
         state = new GameState(player1, player2, puck);
         EXT = ext;
+        myWorld = new Engine(ext , this, 1.5f,0.6f);
     }
 
     @Override

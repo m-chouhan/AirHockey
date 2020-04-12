@@ -1,9 +1,13 @@
 package com.airhockey.entities;
 
 import com.smartfoxserver.v2.entities.data.SFSObject;
+import com.sun.istack.internal.Nullable;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.World;
+
+import java.util.Optional;
 
 public class Player extends Circle {
 
@@ -11,7 +15,7 @@ public class Player extends Circle {
     int score;
 
     public Player(int id, float radius, float x, float y, int score) {
-        super(radius, x, y);
+        super(radius, x, y, 10, BodyType.STATIC);
         this.id = id;
         this.score = score;
     }
