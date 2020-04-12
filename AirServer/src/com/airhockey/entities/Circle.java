@@ -25,8 +25,8 @@ public class Circle implements SFSInterface {
         FixtureDef fd = new FixtureDef();
         fd.shape = cs;
         fd.density = 1;
-        fd.friction = 0.3f;
-        fd.restitution = 0.5f;
+        fd.friction = 0.0f;
+        fd.restitution = 1f;
         // Step 5. Attach the shape to the body with the Fixture.
         myBody.createFixture(fd);
     }
@@ -48,8 +48,16 @@ public class Circle implements SFSInterface {
 
     public Vec2 getPosition() { return myBody.getPosition(); }
 
+    public void setPosition(float x, float y) {
+        getPosition().set(x, y);
+    }
+
     @Override
     public String toString() {
         return getPosition().toString();
+    }
+
+    public void setVelocity(float x, float y) {
+        myBody.m_linearVelocity.set(x, y);
     }
 }

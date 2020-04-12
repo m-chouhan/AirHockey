@@ -34,4 +34,6 @@ public class Player extends Circle {
     public String toString() {
         return "{ id " + id +", "+ getPosition().toString() + ", " + score + " }";
     }
+
+    public int getId() { return id; }
 }

@@ -119,7 +119,7 @@ public class AirHockeyController : MonoBehaviour
                 puck.gameObject.name = "puck";
                 break;
             case "move":
-                other.ParseData(dataObject.GetSFSObject(other.id.ToString()));
+                other.ParsePosition(dataObject.GetSFSObject(other.id.ToString()));
                 puck.ParseData(dataObject.GetSFSObject("puck"));
                 break;
             case "stop":
