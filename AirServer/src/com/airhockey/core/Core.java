@@ -6,6 +6,11 @@ import com.airhockey.entities.Player;
 import com.smartfoxserver.v2.entities.User;
 import com.smartfoxserver.v2.entities.data.ISFSObject;
 import com.smartfoxserver.v2.extensions.SFSExtension;
+import org.jbox2d.collision.shapes.PolygonShape;
+import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.BodyDef;
+import org.jbox2d.dynamics.FixtureDef;
+import org.jbox2d.dynamics.World;
 
 /**
  * Core game logic
@@ -20,20 +25,43 @@ public class Core implements Runnable {
     final float TimeStep = 0.02f;
     final int VelocityIterations = 10, PositionIterations = 8;
     final SFSExtension EXT;
+    final int Width = 4, Height = 2;
 
     public Core(SFSExtension ext, User user1, User user2) {
         ext.trace("core game init!!");
-        Player player1 = new Player(user1.getId(), 0.12f, -1, 0,  0);
-        Player player2 = new Player( 100, 0.12f,1, 0, 0);
-        Circle puck = new Circle(0.15f,-0.5f,0, 1);
-        puck.setVelocity(1f, 0.05f);
+        engine = new Engine(ext , Width, Height);
+        Player player1 = new Player(engine, user1.getId(), 0.5f, -2, 0,  0);
+        Player player2 = new Player(engine, 100, 0.5f,2, 0, 0);
+        Circle puck = new Circle(engine, 0.5f,0,0, 1);
+        puck.setVelocity(2,3);
+        creatBoundry(engine, -(Width+1), 0, 1, Height*2);
+        creatBoundry(engine, Width+1, 0, 1, Height*2);
+        creatBoundry(engine, 0, -(Height+1), Width*2, 1);
+        creatBoundry(engine, 0, Height+1, Width*2, 1);
+
+        //puck.setVelocity(1f, 0.05f);
+
         state = new GameState(player1, player2, puck);
         EXT = ext;
-        engine = new Engine(ext ,  1.5f,0.6f);
         engine
             .addObject(player1)
             .addObject(player2)
             .addObject(puck);
+    }
+
+    public void creatBoundry(World world, float x, float y, float width, float height) {
+        // Static Body
+        BodyDef groundBodyDef = new BodyDef();
+        groundBodyDef.position.set(x, y);
+        Body groundBody = world.createBody(groundBodyDef);
+        PolygonShape groundBox = new PolygonShape();
+        groundBox.setAsBox(width/2, height/2);
+        FixtureDef groundfixture = new FixtureDef();
+        groundfixture.shape = groundBox;
+        groundfixture.density = 10;
+        groundfixture.friction = 0.2f;
+        groundfixture.restitution = 0.9f;
+        groundBody.createFixture(groundfixture);
     }
 
     @Override
@@ -49,6 +77,6 @@ public class Core implements Runnable {
 
     public void updatePlayer(int id, ISFSObject isfsObject) {
         Player player = state.player1.getId() == id ? state.player1 : state.player2;
-        player.setPosition(isfsObject.getFloat("x"), isfsObject.getFloat("y"));
+        //player.setPosition(isfsObject.getFloat("x"), isfsObject.getFloat("y"));
     }
 }

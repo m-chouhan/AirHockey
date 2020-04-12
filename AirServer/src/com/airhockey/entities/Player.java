@@ -14,8 +14,8 @@ public class Player extends Circle {
     int id;
     int score;
 
-    public Player(int id, float radius, float x, float y, int score) {
-        super(radius, x, y, 10, BodyType.STATIC);
+    public Player(World world, int id, float radius, float x, float y, int score) {
+        super(world, radius, x, y, 10, BodyType.STATIC);
         this.id = id;
         this.score = score;
     }
@@ -25,6 +25,18 @@ public class Player extends Circle {
         super.fromSfs(sfsObject);
         this.id = sfsObject.getInt("id");
         this.score = sfsObject.getInt("score");
+    }
+
+    @Override
+    public void setPosition(float x, float y) {
+        //setVelocity(x - position.x, y - position.y);
+        super.setPosition(x, y);
+    }
+
+    @Override
+    public void setPosition(Vec2 pos) {
+        //setVelocity(pos.sub(position));
+        super.setPosition(pos);
     }
 
     @Override

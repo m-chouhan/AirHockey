@@ -113,7 +113,7 @@ public class AirHockeyController : MonoBehaviour
                 }
                 puck.ParseData(dataObject.GetSFSObject("puck"));
 
-                //current.EnableTouch();
+                current.EnableTouch();
                 current.gameObject.name = "me";
                 other.gameObject.name = "other";
                 puck.gameObject.name = "puck";
