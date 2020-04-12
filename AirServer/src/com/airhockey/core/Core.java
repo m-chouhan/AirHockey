@@ -27,10 +27,10 @@ public class Core implements Runnable {
     public Core(SFSExtension ext, User user1, User user2) {
         ext.trace("core game init!!");
         Vec2 gravity = new Vec2(0,0);
-        myWorld = new Engine(gravity, 1.5f,0.6f);
-        Player player1 = new Player(myWorld, user1.getId(), 0.2f, -1, 0,  0);
-        Player player2 = new Player(myWorld, 100, 0.2f,1, 0, 0);
-        Circle puck = new Circle(myWorld,0.2f,-0.5f,0);
+        myWorld = new Engine(this, 1.5f,0.6f);
+        Player player1 = new Player(user1.getId(), 0.2f, -1, 0,  0);
+        Player player2 = new Player( 100, 0.2f,1, 0, 0);
+        Circle puck = new Circle(0.2f,-0.5f,0);
         //Boundary boundary = new Boundary(myWorld, 0, -1, 10, 1);
         puck.setVelocity(1f, 0.2f);
         state = new GameState(player1, player2, puck);

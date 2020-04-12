@@ -10,8 +10,8 @@ public class Player extends Circle {
     int id;
     int score;
 
-    public Player(World world, int id, float radius, float x, float y, int score) {
-        super(world, radius, x, y);
+    public Player(int id, float radius, float x, float y, int score) {
+        super(radius, x, y);
         this.id = id;
         this.score = score;
     }
