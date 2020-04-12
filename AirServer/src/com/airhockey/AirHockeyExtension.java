@@ -36,7 +36,7 @@ public class AirHockeyExtension extends SFSExtension {
         sfsObject.putIntArray("userIds", userIds);
         send("start", sfsObject, userList);
         // Schedule task: executes the game logic on the same frame basis (25 fps) used by the Flash client
-        gameTask = sfs.getTaskScheduler().scheduleAtFixedRate(game, 100, 50, TimeUnit.MILLISECONDS);
+        gameTask = sfs.getTaskScheduler().scheduleAtFixedRate(game, 100, 30, TimeUnit.MILLISECONDS);
     }
 
     public Core getGame() { return game; }

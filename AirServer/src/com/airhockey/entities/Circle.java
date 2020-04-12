@@ -10,32 +10,6 @@ import java.util.Optional;
 
 public class Circle implements SFSInterface {
 
-    /*
-    Body myBody;
-    //TODO : remove this later
-    public Circle(World world, float radius, float x, float y) {
-        // Step 1. Define the body.
-        BodyDef bd = new BodyDef();
-        bd.position.set(x,y);
-        bd.type = BodyType.DYNAMIC;
-
-        // Step 2. Create the body.
-        myBody = world.createBody(bd);
-
-        // Step 3. Define the shape.
-        CircleShape cs = new CircleShape();
-        cs.m_radius = radius;
-        // Step 4. Define the fixture.
-        FixtureDef fd = new FixtureDef();
-        fd.shape = cs;
-        fd.density = 1;
-        fd.friction = 0.0f;
-        fd.restitution = 1f;
-        // Step 5. Attach the shape to the body with the Fixture.
-        myBody.createFixture(fd);
-    }
-    */
-
     Vec2 position = new Vec2();
     Vec2 velocity = new Vec2();
     float radius, mass;
