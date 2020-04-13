@@ -37,6 +37,7 @@ public class Core implements Runnable {
             world.step(1);
             //3. render
             appWrapper.print(state.toString());
+            // network broadcast ? show in ui ? do whatever you want :P
             appWrapper.render(state);
         } else appWrapper.endGame(getWinner(state));
     }

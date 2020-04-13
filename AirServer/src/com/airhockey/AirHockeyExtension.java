@@ -1,6 +1,8 @@
 package com.airhockey;
 
 import com.airhockey.core.Core;
+import com.airhockey.entities.GameState;
+import com.airhockey.entities.Player;
 import com.airhockey.handlers.MovementHandler;
 import com.airhockey.handlers.ReadyHandler;
 import com.smartfoxserver.v2.SmartFoxServer;
@@ -8,12 +10,13 @@ import com.smartfoxserver.v2.entities.User;
 import com.smartfoxserver.v2.entities.data.SFSObject;
 import com.smartfoxserver.v2.extensions.SFSExtension;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-public class AirHockeyExtension extends SFSExtension {
+public class AirHockeyExtension extends SFSExtension implements ApplicationWrapper {
 
     private SmartFoxServer sfs;
     private ScheduledFuture<?> gameTask;
@@ -27,13 +30,22 @@ public class AirHockeyExtension extends SFSExtension {
     }
 
     public void startGame() {
-        List<User> userList = getParentRoom().getUserList();
-        game = new Core(this, userList.get(0), null);
 
-        List<Integer> userIds = userList.stream().map(User::getId).collect(Collectors.toList());
-        userIds.add(100);
+        List<User> userList = getParentRoom().getUserList();
+        List<Integer> userIds = new ArrayList<>();
+        for(User user : userList)
+            userIds.add(user.getId());
+        userIds.add(100); //dummy id
+
+        Player player1 = new Player(userList.get(0).getId());
+        Player player2 = new Player(userList.get(1).getId());
+        game = new Core(this, player1, player2);
+
         SFSObject sfsObject = game.getState().toNetworkObj();
         sfsObject.putIntArray("userIds", userIds);
+        // -> send the list of users as well initially,
+        // TODO : redundunt info, can be removed using iterator on client side
+
         send("start", sfsObject, userList);
         // Schedule task: executes the game logic on the same frame basis (25 fps) used by the Flash client
         gameTask = sfs.getTaskScheduler().scheduleAtFixedRate(game, 100, 30, TimeUnit.MILLISECONDS);
@@ -49,4 +61,16 @@ public class AirHockeyExtension extends SFSExtension {
             gameTask.cancel(true);
         gameTask = null;
     }
+
+    @Override
+    public void print(String s) { trace(s); }
+
+    @Override
+    public void render(GameState state) {
+        send("move", state.toNetworkObj(), getParentRoom().getUserList());
+    }
+
+    //TODO ::
+    @Override
+    public void endGame(Player winner) { }
 }
