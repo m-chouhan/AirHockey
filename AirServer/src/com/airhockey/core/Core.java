@@ -12,7 +12,7 @@ import org.dyn4j.dynamics.World;
 
 public class Core implements Runnable {
 
-    final int Width = 8, Height = 8;
+    final int Width = 9, Height = 5;
     final ApplicationWrapper appWrapper;
     final GameState state;
     final World world;
@@ -23,7 +23,7 @@ public class Core implements Runnable {
         this.world = Builder.setupWorld(Width, Height);
         Builder.incarnate(player1, -Width/2 + 2, 0, world);
         Builder.incarnate(player2, Width/2 - 2, 0, world);
-        Body puck = Builder.createPuck(world, 0, 0);
+        Body puck = Builder.createPuck(world, -4, -2);
         state = new GameState(player1, player2, puck);
     }
 

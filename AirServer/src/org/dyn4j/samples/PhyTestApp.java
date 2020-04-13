@@ -80,9 +80,9 @@ public class PhyTestApp extends SimulationFrame implements ApplicationWrapper {
 		public void mouseDragged(double x, double y) {
 			System.out.println("Mouse dragged (" + x + "," + y+ ")" );
 			// reset the transform of the controller body
-			Transform tx = new Transform();
-			tx.translate(x, y);
-			player.master.setTransform(tx);
+			//Transform tx = new Transform();
+			//tx.translate(x, y);
+			player.setPosition((float) x, (float)y);
 		}
 	}
 

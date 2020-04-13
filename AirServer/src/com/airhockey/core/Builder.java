@@ -43,33 +43,6 @@ public class Builder {
                 createObstacle(0, Height, 2*Width, 1)
         );
 
-//        Body wall1 = new Body();
-//        wall1.addFixture(Geometry.createRectangle(1, 10), 1, 0.2, 0.9);
-//        wall1.setAngularDamping(1);
-//        wall1.setMass(MassType.INFINITE);
-//        wall1.translate(4, 0);
-//        world.addBody(wall1);
-//
-//        Body wall2 = new Body();
-//        wall2.addFixture(Geometry.createRectangle(1, 10), 1, 0.2, 0.9);
-//        wall2.setAngularDamping(1);
-//        wall2.setMass(MassType.INFINITE);
-//        wall2.translate(-4, 0);
-//        world.addBody(wall2);
-//
-//        Body wall3 = new Body();
-//        wall3.addFixture(Geometry.createRectangle(10, 1), 1, 0.2, 0.9);
-//        wall3.setMass(MassType.INFINITE);
-//        wall3.setAngularDamping(1);
-//        wall3.translate(0, 4);
-//        world.addBody(wall3);
-//
-//        Body wall4 = new Body();
-//        wall4.addFixture(Geometry.createRectangle(10, 1), 1, 0.2, 0.9);
-//        wall4.setMass(MassType.INFINITE);
-//        wall4.setAngularDamping(1);
-//        wall4.translate(0, -4);
-//        world.addBody(wall4);
         return world;
     }
 
@@ -85,7 +58,7 @@ public class Builder {
         world.addBody(master);
 
         Body slave = new Body();
-        slave.addFixture(Geometry.createCircle(0.5));
+        slave.addFixture(Geometry.createCircle(0.6));
         slave.setMass(MassType.NORMAL);
         slave.setAngularDamping(1);
         slave.setAutoSleepingEnabled(false);
@@ -105,7 +78,7 @@ public class Builder {
     public static Body createPuck(World world, int x, int y) {
 
         Body circle = new Body();
-        circle.addFixture(Geometry.createCircle(0.5));
+        circle.addFixture(Geometry.createCircle(0.6));
         circle.setMass(MassType.NORMAL);
         circle.setAngularDamping(1);
         circle.setAutoSleepingEnabled(false);

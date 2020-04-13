@@ -14,7 +14,10 @@ public class Player implements NetworkInterface {
     int score;
     public Player(int id) { this.id = id; }
 
-    public void setPosition(float x, float y) { throw new NotImplementedException(); }
+    public void setPosition(float x, float y) {
+        master.getTransform().setTranslationX(x);
+        master.getTransform().setTranslationY(y);
+    }
 
     @Override
     public void fromNetworkObj(SFSObject sfsObject) { }
