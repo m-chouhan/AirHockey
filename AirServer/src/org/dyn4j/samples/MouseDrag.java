@@ -49,7 +49,7 @@ public class MouseDrag extends SimulationFrame {
 	private static final long serialVersionUID = -4132057742762298086L;
 
 	/** The controller body */
-	private Body controller;
+	private static Body master;
 	
 	/** The current mouse drag point */
 	private Point point;
@@ -64,6 +64,10 @@ public class MouseDrag extends SimulationFrame {
 
 		public void mouseDragged(double x, double y) {
 			System.out.println("Mouse dragged (" + x + "," + y+ ")" );
+			// reset the transform of the controller body
+			Transform tx = new Transform();
+			tx.translate(x, y);
+			master.setTransform(tx);
 		}
 	}
 
@@ -81,37 +85,38 @@ public class MouseDrag extends SimulationFrame {
 		// no gravity please
 		World world = new World();
 		world.setGravity(World.ZERO_GRAVITY);
-		
-		// player control setup
-		
-		Body controller = new Body();
-		Circle fixture = Geometry.createCircle(0.1);
-	    controller.addFixture(fixture);
-	    controller.setAngularDamping(1);
-	    controller.setMass(MassType.INFINITE);
-	    controller.setAutoSleepingEnabled(false);
-	    world.addBody(controller);
 
 		Body sb = new Body();
 		sb.addFixture(Geometry.createCircle(0.5));
 		sb.setMass(MassType.NORMAL);
 		sb.setAngularDamping(1);
 		sb.setAutoSleepingEnabled(false);
+		sb.translate(2,2);
 		world.addBody(sb);
 
-		Body player = new Body();
-	    player.addFixture(Geometry.createCircle(0.5));
-	    player.setMass(MassType.NORMAL);
-		player.setAngularDamping(1);
-		player.setAutoSleepingEnabled(false);
-	    world.addBody(player);
-	    
-	    MotorJoint control = new MotorJoint(player, controller);
-	    control.setCollisionAllowed(false);
-	    control.setMaximumForce(1000.0);
-	    control.setMaximumTorque(0.0);
-	    world.addJoint(control);
-	    
+		// player control setup
+
+		master = new Body();
+		Circle fixture = Geometry.createCircle(0.1);
+	    master.addFixture(fixture);
+	    master.setAngularDamping(1);
+	    master.setMass(MassType.INFINITE);
+	    master.setAutoSleepingEnabled(false);
+	    world.addBody(master);
+
+		Body slave = new Body();
+	    slave.addFixture(Geometry.createCircle(0.5));
+	    slave.setMass(MassType.NORMAL);
+		slave.setAngularDamping(1);
+		slave.setAutoSleepingEnabled(false);
+	    world.addBody(slave);
+
+	    MotorJoint motorJoint = new MotorJoint(slave, master);
+	    motorJoint.setCollisionAllowed(false);
+	    motorJoint.setMaximumForce(1000.0);
+	    motorJoint.setMaximumTorque(0.0);
+	    world.addJoint(motorJoint);
+
 	    // obstacles
 	    
 	    Body wall1 = new Body();
@@ -159,7 +164,7 @@ public class MouseDrag extends SimulationFrame {
 			Transform tx = new Transform();
 			tx.translate(x, y);
 
-			this.controller.setTransform(tx);
+			master.setTransform(tx);
 
 			// clear the point
 			this.point = null;
