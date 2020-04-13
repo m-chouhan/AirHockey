@@ -1,15 +1,11 @@
 package com.airhockey.entities;
 
 import com.smartfoxserver.v2.entities.data.SFSObject;
-import com.sun.istack.internal.Nullable;
 import org.jbox2d.collision.shapes.CircleShape;
-import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.*;
 
-import java.util.Optional;
-
-public class Circle implements SFSInterface {
+public class Circle implements NetworkInterface {
 
     Vec2 position = new Vec2();
     Vec2 velocity = new Vec2();
@@ -47,13 +43,13 @@ public class Circle implements SFSInterface {
     }
 
     @Override
-    public void fromSfs(SFSObject sfsObject) {
+    public void fromNetworkObj(SFSObject sfsObject) {
         Vec2 position = new Vec2(sfsObject.getFloat("x"), sfsObject.getFloat("y"));
         this.position.set(position);
     }
 
     @Override
-    public SFSObject toSfs() {
+    public SFSObject toNetworkObj() {
         SFSObject sfsObject = new SFSObject();
         Vec2 position = getPosition();
         sfsObject.putFloat("x", position.x);

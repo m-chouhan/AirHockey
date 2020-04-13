@@ -1,18 +1,11 @@
 package com.airhockey.core;
 
 import com.airhockey.entities.Circle;
-import com.airhockey.entities.GameState;
-import com.airhockey.entities.Player;
-import com.airhockey.entities.SFSInterface;
-import com.smartfoxserver.v2.extensions.ExtensionLogLevel;
 import com.smartfoxserver.v2.extensions.SFSExtension;
-import org.jbox2d.collision.shapes.CircleShape;
-import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.*;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Engine extends World {
 

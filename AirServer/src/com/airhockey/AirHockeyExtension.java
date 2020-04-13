@@ -7,10 +7,6 @@ import com.smartfoxserver.v2.SmartFoxServer;
 import com.smartfoxserver.v2.entities.User;
 import com.smartfoxserver.v2.entities.data.SFSObject;
 import com.smartfoxserver.v2.extensions.SFSExtension;
-import org.jbox2d.collision.shapes.CircleShape;
-import org.jbox2d.collision.shapes.PolygonShape;
-import org.jbox2d.common.Vec2;
-import org.jbox2d.dynamics.*;
 
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
@@ -36,7 +32,7 @@ public class AirHockeyExtension extends SFSExtension {
 
         List<Integer> userIds = userList.stream().map(User::getId).collect(Collectors.toList());
         userIds.add(100);
-        SFSObject sfsObject = game.getState().toSfs();
+        SFSObject sfsObject = game.getState().toNetworkObj();
         sfsObject.putIntArray("userIds", userIds);
         send("start", sfsObject, userList);
         // Schedule task: executes the game logic on the same frame basis (25 fps) used by the Flash client
