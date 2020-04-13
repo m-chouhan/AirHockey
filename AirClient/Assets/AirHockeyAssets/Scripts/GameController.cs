@@ -29,7 +29,7 @@ public class GameController : MonoBehaviour {
 
 	private SmartFox sfs;
 	private bool shuttingDown;
-	private TrisGame trisGame;
+	//private TrisGame trisGame;
 
 	//----------------------------------------------------------
 	// Unity calback methods
@@ -53,8 +53,8 @@ public class GameController : MonoBehaviour {
 		setCurrentGameState(GameState.WAITING_FOR_PLAYERS);
 
 		// Create game logic controller instance
-		trisGame = new TrisGame();
-		trisGame.InitGame(sfs);
+		//trisGame = new TrisGame();
+		//trisGame.InitGame(sfs);
 	}
 	
 	// Update is called once per frame
@@ -72,7 +72,7 @@ public class GameController : MonoBehaviour {
 	//----------------------------------------------------------
 
 	public void OnRestartButtonClick() {
-		trisGame.RestartGame();
+		//trisGame.RestartGame();
 	}
 	
 	public void OnLeaveGameButtonClick() {
@@ -80,7 +80,7 @@ public class GameController : MonoBehaviour {
 		reset();
 
 		// Destroy current game
-		trisGame.DestroyGame();
+		//trisGame.DestroyGame();
 
 		// Leave current room
 		sfs.Send(new Sfs2X.Requests.LeaveRoomRequest());

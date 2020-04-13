@@ -44,6 +44,7 @@ sysinfo.txt
 # *.apk
 *.unitypackage
 *.app
+AirClient.apk
 # Crashlytics generated file
 crashlytics-build.properties
 
