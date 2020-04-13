@@ -11,12 +11,17 @@ public class Player : MonoBehaviour, IClickable
     public void ParseData(ISFSObject sFSObject) {
         id = sFSObject.GetInt("id");
         score = sFSObject.GetInt("score");
+        ParsePosition(sFSObject);
+    }
+
+    public void ParsePosition(ISFSObject sFSObject) {
         transform.position = new Vector2(sFSObject.GetFloat("x"), sFSObject.GetFloat("y"));
     }
 
     public SFSObject ToSFS() {
         SFSObject sfsObject = new SFSObject();
-        sfsObject.PutInt("id", id);
+        //TODO id is redundant, server already knows that!!
+        //sfsObject.PutInt("id", id);
         sfsObject.PutFloat("x", transform.position.x);
         sfsObject.PutFloat("y", transform.position.y);
         return sfsObject;

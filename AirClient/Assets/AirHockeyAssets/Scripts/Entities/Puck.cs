@@ -16,5 +16,4 @@ public class Puck : MonoBehaviour
         sfsObject.PutFloat("y", transform.position.y);
         return sfsObject;
     }
-
 }

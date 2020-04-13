@@ -93,24 +93,27 @@ public class AirHockeyController : MonoBehaviour
     {
         string cmd = (string)evt.Params["cmd"];
         Debug.Log("ext response : " + cmd);
-
         SFSObject dataObject = (SFSObject)evt.Params["params"];
 
-        switch(cmd) {
+        switch (cmd) {
             case "start":
                 // Setup my properties
                 GameObject player1 = Instantiate(playerPrefab);
                 GameObject player2 = Instantiate(playerPrefab);
                 GameObject puckGO = Instantiate(puckPrefab);
-                Player p1 = player1.GetComponent<Player>();
-                Player p2 = player2.GetComponent<Player>();
+                current = player1.GetComponent<Player>();
+                other = player2.GetComponent<Player>();
                 puck = puckGO.GetComponent<Puck>();
 
-                p1.ParseData(dataObject.GetSFSObject("p1"));
-                p2.ParseData(dataObject.GetSFSObject("p2"));
+                current.ParseData(dataObject.GetSFSObject(sfs.MySelf.Id.ToString()));
+                int[] uids = dataObject.GetIntArray("userIds");
+
+                foreach (int uid in uids) {
+                    Debug.Log("uid " + uid);
+                    if (uid != sfs.MySelf.Id)
+                        other.ParseData(dataObject.GetSFSObject(uid.ToString()));
+                }
                 puck.ParseData(dataObject.GetSFSObject("puck"));
-                current = sfs.MySelf.Id == p1.id ? p1 : p2;
-                other = sfs.MySelf.Id == p1.id ? p2 : p1;
 
                 current.EnableTouch();
                 current.gameObject.name = "me";
@@ -118,8 +121,10 @@ public class AirHockeyController : MonoBehaviour
                 puck.gameObject.name = "puck";
                 break;
             case "move":
-                other.ParseData(dataObject.GetSFSObject(other.id.ToString()));
+                other.ParsePosition(dataObject.GetSFSObject(other.id.ToString()));
                 puck.ParseData(dataObject.GetSFSObject("puck"));
+                //current.ParsePosition(dataObject.GetSFSObject(current.id.ToString()));
+
                 break;
             case "stop":
                 break;
