@@ -28,11 +28,15 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
+import java.util.List;
 
+import com.airhockey.ApplicationWrapper;
+import com.airhockey.core.Builder;
+import com.airhockey.core.Core;
+import com.airhockey.entities.GameState;
+import com.airhockey.entities.Player;
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.World;
-import org.dyn4j.dynamics.joint.MotorJoint;
 import org.dyn4j.geometry.*;
 import org.dyn4j.samples.framework.SimulationFrame;
 
@@ -44,16 +48,27 @@ import org.dyn4j.samples.framework.SimulationFrame;
  * @since 3.2.0
  *
  */
-public class MouseDrag extends SimulationFrame {
+public class PhyTestApp extends SimulationFrame implements ApplicationWrapper {
 	/** The serial version id */
 	private static final long serialVersionUID = -4132057742762298086L;
 
 	/** The controller body */
-	private static Body master;
+	private static Player player;
 	
 	/** The current mouse drag point */
 	private Point point;
-	
+
+	@Override
+	public void print(String s) { System.out.println(s); }
+
+	@Override
+	public void render(GameState state, List<Body> bodies) {
+		renderLoop(bodies);
+	}
+
+	@Override
+	public void endGame(Player winner) {}
+
 	/**
 	 * A custom mouse adapter to track mouse drag events.
 	 * @author William Bittle
@@ -67,86 +82,15 @@ public class MouseDrag extends SimulationFrame {
 			// reset the transform of the controller body
 			Transform tx = new Transform();
 			tx.translate(x, y);
-			master.setTransform(tx);
+			player.master.setTransform(tx);
 		}
 	}
 
 	/**
 	 * Default constructor for the window
 	 */
-	public MouseDrag(World world) {
-		super("Mouse Drag", 32.0, world);
-	}
-	
-	/**
-	 * Creates game objects and adds them to the world.
-	 */
-	protected static World initializeWorld() {
-		// no gravity please
-		World world = new World();
-		world.setGravity(World.ZERO_GRAVITY);
-
-		Body sb = new Body();
-		sb.addFixture(Geometry.createCircle(0.5));
-		sb.setMass(MassType.NORMAL);
-		sb.setAngularDamping(1);
-		sb.setAutoSleepingEnabled(false);
-		sb.translate(2,2);
-		world.addBody(sb);
-
-		// player control setup
-
-		master = new Body();
-		Circle fixture = Geometry.createCircle(0.1);
-	    master.addFixture(fixture);
-	    master.setAngularDamping(1);
-	    master.setMass(MassType.INFINITE);
-	    master.setAutoSleepingEnabled(false);
-	    world.addBody(master);
-
-		Body slave = new Body();
-	    slave.addFixture(Geometry.createCircle(0.5));
-	    slave.setMass(MassType.NORMAL);
-		slave.setAngularDamping(1);
-		slave.setAutoSleepingEnabled(false);
-	    world.addBody(slave);
-
-	    MotorJoint motorJoint = new MotorJoint(slave, master);
-	    motorJoint.setCollisionAllowed(false);
-	    motorJoint.setMaximumForce(1000.0);
-	    motorJoint.setMaximumTorque(0.0);
-	    world.addJoint(motorJoint);
-
-	    // obstacles
-	    
-	    Body wall1 = new Body();
-	    wall1.addFixture(Geometry.createRectangle(1, 10), 1, 0.2, 0.9);
-	    wall1.setAngularDamping(1);
-	    wall1.setMass(MassType.INFINITE);
-	    wall1.translate(4, 0);
-	    world.addBody(wall1);
-
-		Body wall2 = new Body();
-		wall2.addFixture(Geometry.createRectangle(1, 10), 1, 0.2, 0.9);
-		wall2.setAngularDamping(1);
-		wall2.setMass(MassType.INFINITE);
-		wall2.translate(-4, 0);
-		world.addBody(wall2);
-
-		Body wall3 = new Body();
-		wall3.addFixture(Geometry.createRectangle(10, 1), 1, 0.2, 0.9);
-		wall3.setMass(MassType.INFINITE);
-		wall3.setAngularDamping(1);
-		wall3.translate(0, 4);
-		world.addBody(wall3);
-
-		Body wall4 = new Body();
-		wall4.addFixture(Geometry.createRectangle(10, 1), 1, 0.2, 0.9);
-		wall4.setMass(MassType.INFINITE);
-		wall4.setAngularDamping(1);
-		wall4.translate(0, -4);
-		world.addBody(wall4);
-		return world;
+	public PhyTestApp() {
+		super("Mouse Drag", 32.0);
 	}
 
 	/* (non-Javadoc)
@@ -164,7 +108,7 @@ public class MouseDrag extends SimulationFrame {
 			Transform tx = new Transform();
 			tx.translate(x, y);
 
-			master.setTransform(tx);
+			player.master.setTransform(tx);
 
 			// clear the point
 			this.point = null;
@@ -192,21 +136,26 @@ public class MouseDrag extends SimulationFrame {
 	 * @param args command line arguments
 	 */
 	public static void main(String[] args) {
-		World world = initializeWorld();
 
-		MouseDrag javaFrame = new MouseDrag(world);
+		Player player1 = new Player(10);
+		Player player2 = new Player(20);
+		PhyTestApp.player = player1;
+
+		PhyTestApp javaFrame = new PhyTestApp();
+		javaFrame.setupRender();
+
+		Core core = new Core(javaFrame, player1, player2);
+
 		// setup the mouse listening
 		InputAdapter ml = new InputAdapter();
 		javaFrame.setMouseListener(ml);
-		javaFrame.setupRender();
+
 		Thread thread = new Thread() {
 			public void run() {
 				// perform an infinite loop stopped
 				// render as fast as possible
 				while (!javaFrame.isStopped()) {
-
-					world.step(1);
-					javaFrame.renderLoop();
+					core.run();
 					try {
 						Thread.sleep(5);
 					} catch (InterruptedException e) {}

@@ -35,6 +35,7 @@ import java.awt.event.WindowEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferStrategy;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.UIManager;
@@ -42,7 +43,6 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.BodyFixture;
-import org.dyn4j.dynamics.World;
 import org.dyn4j.geometry.Convex;
 
 /**
@@ -59,9 +59,6 @@ public abstract class SimulationFrame extends JFrame {
 
 	/** The canvas to draw to */
 	protected final Canvas canvas;
-
-	/** The dynamics engine */
-	protected final World world;
 
 	/** The pixels per meter scale factor */
 	protected final double scale;
@@ -82,15 +79,12 @@ public abstract class SimulationFrame extends JFrame {
 	 * @param name the frame name
 	 * @param scale the pixels per meter scale factor
 	 */
-	public SimulationFrame(String name, double scale, World world) {
+	public SimulationFrame(String name, double scale) {
 		super(name);
 		
 		// set the scale
 		this.scale = scale;
-		
-		// create the world
-		this.world = world;
-		
+
 		// setup the JFrame
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
@@ -132,7 +126,7 @@ public abstract class SimulationFrame extends JFrame {
 	 * The method calling the necessary methods to update
 	 * the game, graphics, and poll for input.
 	 */
-	public void renderLoop() {
+	public void renderLoop(List<Body> bodies) {
 		// get the graphics object to render to
 		Graphics2D g = (Graphics2D)this.canvas.getBufferStrategy().getDrawGraphics();
 		
@@ -156,12 +150,8 @@ public abstract class SimulationFrame extends JFrame {
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 		// draw all the objects in the world
-		for (int i = 0; i < this.world.getBodyCount(); i++) {
-			// get the object
-			Body body = this.world.getBody(i);
-			this.render(g, elapsedTime, body);
-		}
-
+		for(Body body : bodies)
+			render(g, elapsedTime, body);
 		// dispose of the graphics object
 		g.dispose();
 		

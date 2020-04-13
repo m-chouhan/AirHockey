@@ -16,9 +16,15 @@ public class MovementHandler extends BaseClientRequestHandler {
         AirHockeyExtension extension = (AirHockeyExtension) getParentExtension();
         List<User> list = extension.getParentRoom().getUserList();
         List<User> otherPlayersList = new ArrayList<>(list);
-        otherPlayersList.removeIf(user1 -> user1.getId() == user.getId());
+        //TODO :
+        // optimize this, for simplicity broadcast all the messages as of now
+        // client will ignore the information if redundant
+        //otherPlayersList.removeIf(user1 -> user1.getId() == user.getId());
 
-        extension.getGame().updatePlayer(user.getId(), isfsObject);
+        extension
+                .getGame()
+                .getState()
+                .updateState(user.getId(), isfsObject.getFloat("x"), isfsObject.getFloat("y"));
 
         ISFSObject payload = new SFSObject();
         payload.putSFSObject(String.valueOf(user.getId()), isfsObject);

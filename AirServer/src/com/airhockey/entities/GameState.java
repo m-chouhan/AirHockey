@@ -34,11 +34,12 @@ public class GameState implements NetworkInterface {
 
     @Override
     public String toString() {
-        return "P1 : " + player1.toString() + ", P2 : " + player2.toString() + ", Puck : " + puck.getTransform().toString();
+        return "P1 : " + player1.toString() + ", P2 : " + player2.toString() + ", Puck : ("
+                + puck.getTransform().getTranslationX() + ", " + puck.getTransform().getTranslationY() + ")";
     }
 
     public void updateState(int id, float x, float y) {
         Player player = player1.id == id ? player1 : player2;
-        player.setPosition(x,y);
+        player.setPosition(x, y);
     }
 }

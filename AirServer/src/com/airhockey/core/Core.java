@@ -12,17 +12,17 @@ import org.dyn4j.dynamics.World;
 
 public class Core implements Runnable {
 
-    final int Width = 10, Height = 10;
+    final int Width = 8, Height = 8;
     final ApplicationWrapper appWrapper;
     final GameState state;
     final World world;
 
     public Core(ApplicationWrapper appWrapper, Player player1, Player player2) {
-        appWrapper.print("core game setup started!!");
+        appWrapper.print("core game setup started!! " + Width + "," + Height);
         this.appWrapper = appWrapper;
         this.world = Builder.setupWorld(Width, Height);
-        Builder.incarnate(player1, -Width/2, 0, world);
-        Builder.incarnate(player2, Width/2, 0, world);
+        Builder.incarnate(player1, -Width/2 + 2, 0, world);
+        Builder.incarnate(player2, Width/2 - 2, 0, world);
         Body puck = Builder.createPuck(world, 0, 0);
         state = new GameState(player1, player2, puck);
     }
@@ -38,7 +38,7 @@ public class Core implements Runnable {
             //3. render
             appWrapper.print(state.toString());
             // network broadcast ? show in ui ? do whatever you want :P
-            appWrapper.render(state);
+            appWrapper.render(state, world.getBodies());
         } else appWrapper.endGame(getWinner(state));
     }
 

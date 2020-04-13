@@ -9,6 +9,7 @@ import com.smartfoxserver.v2.SmartFoxServer;
 import com.smartfoxserver.v2.entities.User;
 import com.smartfoxserver.v2.entities.data.SFSObject;
 import com.smartfoxserver.v2.extensions.SFSExtension;
+import org.dyn4j.dynamics.Body;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +67,7 @@ public class AirHockeyExtension extends SFSExtension implements ApplicationWrapp
     public void print(String s) { trace(s); }
 
     @Override
-    public void render(GameState state) {
+    public void render(GameState state, List<Body> bodies) {
         send("move", state.toNetworkObj(), getParentRoom().getUserList());
     }
 
