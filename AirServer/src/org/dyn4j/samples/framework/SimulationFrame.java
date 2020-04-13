@@ -33,13 +33,17 @@ import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferStrategy;
 
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import org.dyn4j.dynamics.Body;
+import org.dyn4j.dynamics.BodyFixture;
 import org.dyn4j.dynamics.World;
+import org.dyn4j.geometry.Convex;
 
 /**
  * A very VERY simple framework for building samples.
@@ -154,7 +158,7 @@ public abstract class SimulationFrame extends JFrame {
 		// draw all the objects in the world
 		for (int i = 0; i < this.world.getBodyCount(); i++) {
 			// get the object
-			SimulationBody body = (SimulationBody) this.world.getBody(i);
+			Body body = this.world.getBody(i);
 			this.render(g, elapsedTime, body);
 		}
 
@@ -210,9 +214,71 @@ public abstract class SimulationFrame extends JFrame {
 	 * @param elapsedTime the elapsed time from the last update
 	 * @param body the body to render
 	 */
-	protected void render(Graphics2D g, double elapsedTime, SimulationBody body) {
+	protected void render(Graphics2D g, double elapsedTime, Body body) {
 		// draw the object
-		body.render(g, this.scale);
+		render(body, g, this.scale, Color.CYAN);
+	}
+
+	/**
+	 * Draws the body.
+	 * <p>
+	 * Only coded for polygons and circles.
+	 * @param g the graphics object to render to
+	 * @param scale the scaling factor
+	 * @param color the color to render the body
+	 */
+	public void render(Body body, Graphics2D g, double scale, Color color) {
+		// point radius
+		final int pr = 4;
+
+		// save the original transform
+		AffineTransform ot = g.getTransform();
+
+		// transform the coordinate system from world coordinates to local coordinates
+		AffineTransform lt = new AffineTransform();
+		lt.translate(body.getTransform().getTranslationX() * scale, body.getTransform().getTranslationY() * scale);
+		lt.rotate(body.getTransform().getRotationAngle());
+
+		// apply the transform
+		g.transform(lt);
+
+		// loop over all the body fixtures for this body
+		for (BodyFixture fixture : body.getFixtures()) {
+			renderFixture(body, g, scale, fixture, color);
+		}
+
+		// draw a center point
+		Ellipse2D.Double ce = new Ellipse2D.Double(
+				body.getLocalCenter().x * scale - pr * 0.5,
+				body.getLocalCenter().y * scale - pr * 0.5,
+				pr,
+				pr);
+		g.setColor(Color.WHITE);
+		g.fill(ce);
+		g.setColor(Color.DARK_GRAY);
+		g.draw(ce);
+
+		// set the original transform
+		g.setTransform(ot);
+	}
+
+	/**
+	 * Renders the given fixture.
+	 * @param g the graphics object to render to
+	 * @param scale the scaling factor
+	 * @param fixture the fixture to render
+	 * @param color the color to render the fixture
+	 */
+	protected void renderFixture(Body body, Graphics2D g, double scale, BodyFixture fixture, Color color) {
+		// get the shape on the fixture
+		Convex convex = fixture.getShape();
+
+		// brighten the color if asleep
+		if (body.isAsleep()) {
+			color = color.brighter();
+		}
+		// render the fixture
+		Graphics2DRenderer.render(g, convex, scale, color);
 	}
 
 	/**

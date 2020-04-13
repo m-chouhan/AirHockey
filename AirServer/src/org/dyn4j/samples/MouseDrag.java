@@ -24,17 +24,16 @@
  */
 package org.dyn4j.samples;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 
+import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.World;
 import org.dyn4j.dynamics.joint.MotorJoint;
 import org.dyn4j.geometry.*;
-import org.dyn4j.samples.framework.SimulationBody;
 import org.dyn4j.samples.framework.SimulationFrame;
 
 /**
@@ -50,7 +49,7 @@ public class MouseDrag extends SimulationFrame {
 	private static final long serialVersionUID = -4132057742762298086L;
 
 	/** The controller body */
-	private SimulationBody controller;
+	private Body controller;
 	
 	/** The current mouse drag point */
 	private Point point;
@@ -85,7 +84,7 @@ public class MouseDrag extends SimulationFrame {
 		
 		// player control setup
 		
-		SimulationBody controller = new SimulationBody(Color.CYAN);
+		Body controller = new Body();
 		Circle fixture = Geometry.createCircle(0.1);
 	    controller.addFixture(fixture);
 	    controller.setAngularDamping(1);
@@ -93,14 +92,14 @@ public class MouseDrag extends SimulationFrame {
 	    controller.setAutoSleepingEnabled(false);
 	    world.addBody(controller);
 
-		SimulationBody sb = new SimulationBody(Color.ORANGE);
+		Body sb = new Body();
 		sb.addFixture(Geometry.createCircle(0.5));
 		sb.setMass(MassType.NORMAL);
 		sb.setAngularDamping(1);
 		sb.setAutoSleepingEnabled(false);
 		world.addBody(sb);
 
-		SimulationBody player = new SimulationBody(Color.GREEN);
+		Body player = new Body();
 	    player.addFixture(Geometry.createCircle(0.5));
 	    player.setMass(MassType.NORMAL);
 		player.setAngularDamping(1);
@@ -115,28 +114,28 @@ public class MouseDrag extends SimulationFrame {
 	    
 	    // obstacles
 	    
-	    SimulationBody wall1 = new SimulationBody();
+	    Body wall1 = new Body();
 	    wall1.addFixture(Geometry.createRectangle(1, 10), 1, 0.2, 0.9);
 	    wall1.setAngularDamping(1);
 	    wall1.setMass(MassType.INFINITE);
 	    wall1.translate(4, 0);
 	    world.addBody(wall1);
 
-		SimulationBody wall2 = new SimulationBody();
+		Body wall2 = new Body();
 		wall2.addFixture(Geometry.createRectangle(1, 10), 1, 0.2, 0.9);
 		wall2.setAngularDamping(1);
 		wall2.setMass(MassType.INFINITE);
 		wall2.translate(-4, 0);
 		world.addBody(wall2);
 
-		SimulationBody wall3 = new SimulationBody();
+		Body wall3 = new Body();
 		wall3.addFixture(Geometry.createRectangle(10, 1), 1, 0.2, 0.9);
 		wall3.setMass(MassType.INFINITE);
 		wall3.setAngularDamping(1);
 		wall3.translate(0, 4);
 		world.addBody(wall3);
 
-		SimulationBody wall4 = new SimulationBody();
+		Body wall4 = new Body();
 		wall4.addFixture(Geometry.createRectangle(10, 1), 1, 0.2, 0.9);
 		wall4.setMass(MassType.INFINITE);
 		wall4.setAngularDamping(1);
