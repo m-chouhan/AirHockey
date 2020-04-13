@@ -107,7 +107,9 @@ public class AirHockeyController : MonoBehaviour
 
                 current.ParseData(dataObject.GetSFSObject(sfs.MySelf.Id.ToString()));
                 int[] uids = dataObject.GetIntArray("userIds");
+
                 foreach (int uid in uids) {
+                    Debug.Log("uid " + uid);
                     if (uid != sfs.MySelf.Id)
                         other.ParseData(dataObject.GetSFSObject(uid.ToString()));
                 }
@@ -121,7 +123,7 @@ public class AirHockeyController : MonoBehaviour
             case "move":
                 other.ParsePosition(dataObject.GetSFSObject(other.id.ToString()));
                 puck.ParseData(dataObject.GetSFSObject("puck"));
-                current.ParsePosition(dataObject.GetSFSObject(current.id.ToString()));
+                //current.ParsePosition(dataObject.GetSFSObject(current.id.ToString()));
 
                 break;
             case "stop":
