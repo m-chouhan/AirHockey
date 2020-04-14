@@ -57,8 +57,11 @@ public class Core implements Runnable {
         if(striker != null) {
             striker.updateScore();
             appWrapper.scoreUpdated(striker);
-            if(striker.score == MaxScore)
+            if(striker.score == MaxScore) {
                 appWrapper.endGame(striker);
+                paused = true;
+                return;
+            }
             else {
                 resetGame(state);
                 appWrapper.resetGame(state);

@@ -39,7 +39,7 @@ public class AirHockeyExtension extends SFSExtension implements ApplicationWrapp
 
         Player player1 = new Player(userIds.get(0));
         Player player2 = new Player(userIds.get(1));
-        game = new Core(this, player1, player2, 5);
+        game = new Core(this, player1, player2, 3);
 
         SFSObject sfsObject = game.getState().toNetworkObj();
         sfsObject.putIntArray("userIds", userIds);
@@ -73,8 +73,9 @@ public class AirHockeyExtension extends SFSExtension implements ApplicationWrapp
     //TODO ::
     @Override
     public void endGame(Player winner) {
-        send("end", winner.toNetworkObj(), getParentRoom().getUserList());
-        destroy();
+        SFSObject response = new SFSObject();
+        response.putInt("id", winner.id);
+        send("end", response, getParentRoom().getUserList());
     }
 
     @Override

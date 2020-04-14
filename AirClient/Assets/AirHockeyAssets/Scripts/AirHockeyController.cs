@@ -12,6 +12,8 @@ public class AirHockeyController : MonoBehaviour
     private SmartFox sfs;
     public GameObject playerPrefab;
     public GameObject puckPrefab;
+    public GameObject gameWonPanel;
+    public GameObject gameLosePanel;
 
     private Player current, other;
     private Puck puck;
@@ -93,11 +95,12 @@ public class AirHockeyController : MonoBehaviour
     public void OnExtensionResponse(BaseEvent evt)
     {
         string cmd = (string)evt.Params["cmd"];
-        Debug.Log("ext response : " + cmd);
+
         SFSObject dataObject = (SFSObject)evt.Params["params"];
 
         switch (cmd) {
             case "start":
+                Debug.Log("ext response : " + cmd);
                 // Setup my properties
                 GameObject player1 = Instantiate(playerPrefab);
                 GameObject player2 = Instantiate(playerPrefab);
@@ -122,7 +125,7 @@ public class AirHockeyController : MonoBehaviour
                     }
                 }
                 //---
-                puck.SetPosition(dataObject.GetSFSObject("puck"));
+                puck.SetPosition(dataObject);
 
                 if(current.transform.position.x < 0)
                 {
@@ -153,6 +156,7 @@ public class AirHockeyController : MonoBehaviour
                 puck.SetPosition(dataObject);
                 break;
             case "updateScore":
+                Debug.Log("ext response : " + cmd);
                 current.SetScore(dataObject);
                 other.SetScore(dataObject);
                 break;
@@ -161,7 +165,12 @@ public class AirHockeyController : MonoBehaviour
                 other.SetPosition(dataObject);
                 puck.SetPosition(dataObject);
                 break;
-            case "stop":
+            case "end":
+                Debug.Log("ext response : " + cmd);
+                bool won = dataObject.GetInt("id") == sfs.MySelf.Id;
+                Debug.Log("End game " + won);
+                if (won) gameWonPanel.SetActive(true); 
+                else gameLosePanel.SetActive(true);
                 break;
          }
     }
