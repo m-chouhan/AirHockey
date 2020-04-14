@@ -16,6 +16,9 @@ public class Core implements Runnable {
     final ApplicationWrapper appWrapper;
     final GameState state;
     final World world;
+    private long lastUpdateTime;
+    /** The conversion factor from nano to base */
+    public static final double NANO_TO_BASE = 1.0e9;
 
     public Core(ApplicationWrapper appWrapper, Player player1, Player player2) {
         appWrapper.print("core game setup started!! " + Width + "," + Height);
@@ -34,7 +37,16 @@ public class Core implements Runnable {
         if(getWinner(state) == null) {
             //1. processInput();
             //2. update world
-            world.step(1);
+            // get the current time
+            long time = System.nanoTime();
+            // get the elapsed time from the last iteration
+            long diff = time - this.lastUpdateTime;
+            // set the last time
+            this.lastUpdateTime = time;
+            // convert from nanoseconds to seconds
+            double elapsedTime = (double)diff / NANO_TO_BASE;
+            world.update(elapsedTime);
+
             //3. render
             appWrapper.print(state.toString());
             // network broadcast ? show in ui ? do whatever you want :P
