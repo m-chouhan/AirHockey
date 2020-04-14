@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 public class AirHockeyExtension extends SFSExtension implements ApplicationWrapper {
 
@@ -36,11 +35,11 @@ public class AirHockeyExtension extends SFSExtension implements ApplicationWrapp
         List<Integer> userIds = new ArrayList<>();
         for(User user : userList)
             userIds.add(user.getId());
-        //userIds.add(100); //dummy id
+//        userIds.add(100); //dummy id for testing purposes
 
         Player player1 = new Player(userIds.get(0));
         Player player2 = new Player(userIds.get(1));
-        game = new Core(this, player1, player2);
+        game = new Core(this, player1, player2, 5);
 
         SFSObject sfsObject = game.getState().toNetworkObj();
         sfsObject.putIntArray("userIds", userIds);
@@ -73,5 +72,8 @@ public class AirHockeyExtension extends SFSExtension implements ApplicationWrapp
 
     //TODO ::
     @Override
-    public void endGame(Player winner) { }
+    public void endGame(Player winner) {
+        send("end", winner.toNetworkObj(), getParentRoom().getUserList());
+        destroy();
+    }
 }
