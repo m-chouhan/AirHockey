@@ -56,9 +56,13 @@ public class Core implements Runnable {
         Player striker = checkForGoal(state);
         if(striker != null) {
             striker.updateScore();
+            appWrapper.scoreUpdated(striker);
             if(striker.score == MaxScore)
                 appWrapper.endGame(striker);
-            else resetGame(state);
+            else {
+                resetGame(state);
+                appWrapper.resetGame(state);
+            }
         }
 
         //3. render
@@ -71,7 +75,6 @@ public class Core implements Runnable {
         state.player1.setPosition(-(float)Width/2, 0);
         state.player2.setPosition((float)Width/2, 0);
         state.puck.getTransform().setTranslation(0,0);
-
         state.puck.setLinearVelocity(0,0);
     }
 

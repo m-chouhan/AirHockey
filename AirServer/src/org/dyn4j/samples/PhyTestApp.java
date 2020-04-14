@@ -69,6 +69,16 @@ public class PhyTestApp extends SimulationFrame implements ApplicationWrapper {
 	@Override
 	public void endGame(Player winner) {}
 
+	@Override
+	public void scoreUpdated(Player striker) {
+		print("Score updated for " + striker.id + " to " + striker.score);
+	}
+
+	@Override
+	public void resetGame(GameState state) {
+
+	}
+
 	/**
 	 * A custom mouse adapter to track mouse drag events.
 	 * @author William Bittle

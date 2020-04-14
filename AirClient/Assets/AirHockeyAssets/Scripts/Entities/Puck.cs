@@ -4,16 +4,15 @@ using Sfs2X.Entities.Data;
 
 public class Puck : MonoBehaviour
 {
-    public void ParseData(ISFSObject sFSObject)
+    public void SetPosition(ISFSObject sFSObject)
     {
-        transform.position = new Vector2(sFSObject.GetFloat("x"), sFSObject.GetFloat("y"));
-    }
+        SFSObject posObj = (SFSObject)sFSObject.GetSFSObject("puck");
+        if (posObj == null)
+        {
+            Debug.Log("sfs null in " + name);
+            return;
+        }
 
-    public SFSObject ToSFS()
-    {
-        SFSObject sfsObject = new SFSObject();
-        sfsObject.PutFloat("x", transform.position.x);
-        sfsObject.PutFloat("y", transform.position.y);
-        return sfsObject;
+        transform.position = new Vector2(posObj.GetFloat("x"), posObj.GetFloat("y"));
     }
 }

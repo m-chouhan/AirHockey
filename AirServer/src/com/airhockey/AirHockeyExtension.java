@@ -48,7 +48,7 @@ public class AirHockeyExtension extends SFSExtension implements ApplicationWrapp
 
         send("start", sfsObject, userList);
         // Schedule task: executes the game logic on the same frame basis (25 fps) used by the Flash client
-        gameTask = sfs.getTaskScheduler().scheduleAtFixedRate(game, 100, 10, TimeUnit.MILLISECONDS);
+        gameTask = sfs.getTaskScheduler().scheduleAtFixedRate(game, 100, 15, TimeUnit.MILLISECONDS);
     }
 
     public Core getGame() { return game; }
@@ -75,5 +75,17 @@ public class AirHockeyExtension extends SFSExtension implements ApplicationWrapp
     public void endGame(Player winner) {
         send("end", winner.toNetworkObj(), getParentRoom().getUserList());
         destroy();
+    }
+
+    @Override
+    public void scoreUpdated(Player striker) {
+        SFSObject resp = new SFSObject();
+        resp.putInt(String.valueOf(striker.id), striker.score);
+        send("updateScore", resp, getParentRoom().getUserList());
+    }
+
+    @Override
+    public void resetGame(GameState state) {
+        send("reset", state.toNetworkObj(), getParentRoom().getUserList());
     }
 }

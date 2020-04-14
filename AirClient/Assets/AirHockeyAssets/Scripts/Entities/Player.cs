@@ -1,27 +1,44 @@
 ﻿using UnityEngine;
 using Sfs2X.Entities.Data;
 using UnityEngine.EventSystems;
+using System;
+using TMPro;
 
 public class Player : MonoBehaviour, IClickable
 {
-    public int id;
-    public int score;
+    public int id = 0;
+    public int score = 0;
+    TextMeshProUGUI text;
     public bool touchEnabled = false;
 
-    public void ParseData(ISFSObject sFSObject) {
-        id = sFSObject.GetInt("id");
-        score = sFSObject.GetInt("score");
-        ParsePosition(sFSObject);
+    public void SetPosition(ISFSObject sfsObj) {
+        SFSObject posObj = (SFSObject) sfsObj.GetSFSObject(id.ToString());
+        if(posObj == null)
+        {
+            Debug.Log("sfs null in " + name + ", id " + id);
+            return;
+        }
+
+        transform.position = new Vector2(posObj.GetFloat("x"), posObj.GetFloat("y"));
     }
 
-    public void ParsePosition(ISFSObject sFSObject) {
-        transform.position = new Vector2(sFSObject.GetFloat("x"), sFSObject.GetFloat("y"));
+    public void SetScore(ISFSObject sfsObj) {
+        if (!sfsObj.ContainsKey(id.ToString()))
+            return;
+
+        score = sfsObj.GetInt(id.ToString());
+        text.text = score.ToString();
+        Debug.Log("score set to " + score + " for " + name);
+    }
+
+    public void SetScore(int score)
+    {
+        this.score = score;
+        text.text = score.ToString();
     }
 
     public SFSObject ToSFS() {
         SFSObject sfsObject = new SFSObject();
-        //TODO id is redundant, server already knows that!!
-        //sfsObject.PutInt("id", id);
         sfsObject.PutFloat("x", transform.position.x);
         sfsObject.PutFloat("y", transform.position.y);
         return sfsObject;
@@ -62,11 +79,6 @@ public class Player : MonoBehaviour, IClickable
         }
     }
 
-    internal void EnableTouch()
-    {
-        touchEnabled = true;
-    }
-
     // if capture the point only if it lies towards players touchable area
     // i.e either -ve x axis or +ve x axis
     public bool capture(Vector2 touchPoint)
@@ -75,4 +87,12 @@ public class Player : MonoBehaviour, IClickable
             ((touchPoint.x < 0 && transform.position.x < 0) || (touchPoint.x >= 0 && transform.position.x >= 0));
     }
 
+    internal void SetTextComponent(TMPro.TextMeshProUGUI textMeshProUGUI)
+    {
+        text = textMeshProUGUI;
+    }
+
+    internal void SetId(int id) { this.id = id; }
+
+    internal void EnableTouch() { touchEnabled = true; }
 }
