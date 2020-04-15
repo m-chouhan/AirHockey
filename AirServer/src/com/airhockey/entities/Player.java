@@ -40,4 +40,13 @@ public class Player implements NetworkInterface {
     public void updateScore() {
         score++;
     }
+
+    /**
+     * Mark as dirty only if slave is moving
+     * @return
+     */
+    public boolean isDirty() {
+        Vector2 velocity = slave.getLinearVelocity();
+        return Math.abs(velocity.x) > 0.1f || Math.abs(velocity.y) > 0.1f;
+    }
 }

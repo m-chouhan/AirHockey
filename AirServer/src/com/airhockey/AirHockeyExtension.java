@@ -69,12 +69,44 @@ public class AirHockeyExtension extends SFSExtension implements ApplicationWrapp
     @Override
     public void render(GameState state, List<Body> bodies) {
         //only thing we need to send here is puck position
-        SFSObject resp = new SFSObject();
+        List<User> users = getParentRoom().getUserList();
+
+        User player1 = users.stream()
+                        .filter(user -> user.getId() == state.player1.id)
+                        .findAny()
+                        .orElse(null);
+        User player2 = users.stream()
+                        .filter(user -> user.getId() == state.player2.id)
+                        .findAny()
+                        .orElse(null);
+
         SFSObject puckPos = new SFSObject();
         puckPos.putFloat("x", (float) state.puck.getTransform().getTranslationX());
         puckPos.putFloat("y", (float) state.puck.getTransform().getTranslationY());
-        resp.putSFSObject("puck", puckPos);
-        send("move", resp, getParentRoom().getUserList());
+
+        if(player1 != null) {
+            SFSObject resp = new SFSObject();
+            resp.putSFSObject("puck", puckPos);
+            if(state.player2.isDirty()) {
+                SFSObject playerPos = new SFSObject();
+                playerPos.putFloat("x", (float) state.player2.slave.getTransform().getTranslationX());
+                playerPos.putFloat("y", (float) state.player2.slave.getTransform().getTranslationY());
+                resp.putSFSObject(String.valueOf(state.player2.id), playerPos);
+            }
+            send("move", resp, player1);
+        }
+
+        if(player2 != null) {
+            SFSObject resp = new SFSObject();
+            resp.putSFSObject("puck", puckPos);
+            if(state.player1.isDirty()) {
+                SFSObject playerPos = new SFSObject();
+                playerPos.putFloat("x", (float) state.player1.slave.getTransform().getTranslationX());
+                playerPos.putFloat("y", (float) state.player1.slave.getTransform().getTranslationY());
+                resp.putSFSObject(String.valueOf(state.player1.id), playerPos);
+            }
+            send("move", resp, player2);
+        }
     }
 
     //TODO ::
