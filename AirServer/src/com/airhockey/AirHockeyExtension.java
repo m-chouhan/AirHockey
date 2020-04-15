@@ -7,6 +7,7 @@ import com.airhockey.handlers.MovementHandler;
 import com.airhockey.handlers.ReadyHandler;
 import com.smartfoxserver.v2.SmartFoxServer;
 import com.smartfoxserver.v2.entities.User;
+import com.smartfoxserver.v2.entities.data.ISFSObject;
 import com.smartfoxserver.v2.entities.data.SFSObject;
 import com.smartfoxserver.v2.extensions.SFSExtension;
 import org.dyn4j.dynamics.Body;
@@ -67,7 +68,13 @@ public class AirHockeyExtension extends SFSExtension implements ApplicationWrapp
 
     @Override
     public void render(GameState state, List<Body> bodies) {
-        send("move", state.toNetworkObj(), getParentRoom().getUserList());
+        //only thing we need to send here is puck position
+        SFSObject resp = new SFSObject();
+        SFSObject puckPos = new SFSObject();
+        puckPos.putFloat("x", (float) state.puck.getTransform().getTranslationX());
+        puckPos.putFloat("y", (float) state.puck.getTransform().getTranslationY());
+        resp.putSFSObject("puck", puckPos);
+        send("move", resp, getParentRoom().getUserList());
     }
 
     //TODO ::
