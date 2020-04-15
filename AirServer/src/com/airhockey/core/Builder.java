@@ -58,7 +58,7 @@ public class Builder {
         world.addBody(master);
 
         Body slave = new Body();
-        slave.addFixture(Geometry.createCircle(0.6));
+        slave.addFixture(Geometry.createCircle(0.65));
         slave.setMass(MassType.NORMAL);
         slave.setAngularDamping(1);
         slave.setAutoSleepingEnabled(false);
@@ -66,7 +66,7 @@ public class Builder {
 
         MotorJoint motorJoint = new MotorJoint(slave, master);
         motorJoint.setCollisionAllowed(false);
-        motorJoint.setMaximumForce(1000.0);
+        motorJoint.setMaximumForce(2000.0);
         motorJoint.setMaximumTorque(0.0);
         world.addJoint(motorJoint);
 
