@@ -75,7 +75,7 @@ public class Builder {
         player.slave = slave;
     }
 
-    public static Body createPuck(World world, int x, int y) {
+    public static Body createPuck(int x, int y, World world) {
 
         Body circle = new Body();
         circle.addFixture(Geometry.createCircle(0.6));

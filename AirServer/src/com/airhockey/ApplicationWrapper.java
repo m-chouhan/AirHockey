@@ -10,4 +10,7 @@ public interface ApplicationWrapper {
     void print(String s);
     void render(GameState state, List<Body> bodies);
     void endGame(Player winner);
+    void scoreUpdated(Player striker);
+
+    void resetGame(GameState state);
 }

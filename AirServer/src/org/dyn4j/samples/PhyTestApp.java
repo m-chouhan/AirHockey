@@ -69,6 +69,16 @@ public class PhyTestApp extends SimulationFrame implements ApplicationWrapper {
 	@Override
 	public void endGame(Player winner) {}
 
+	@Override
+	public void scoreUpdated(Player striker) {
+		print("Score updated for " + striker.id + " to " + striker.score);
+	}
+
+	@Override
+	public void resetGame(GameState state) {
+
+	}
+
 	/**
 	 * A custom mouse adapter to track mouse drag events.
 	 * @author William Bittle
@@ -137,6 +147,11 @@ public class PhyTestApp extends SimulationFrame implements ApplicationWrapper {
 	 */
 	public static void main(String[] args) {
 
+		if(args.length > 0) {
+			System.out.println("This is server only build, hence not running the simulation");
+			return;
+		};
+
 		Player player1 = new Player(10);
 		Player player2 = new Player(20);
 		PhyTestApp.player = player1;
@@ -144,7 +159,7 @@ public class PhyTestApp extends SimulationFrame implements ApplicationWrapper {
 		PhyTestApp javaFrame = new PhyTestApp();
 		javaFrame.setupRender();
 
-		Core core = new Core(javaFrame, player1, player2);
+		Core core = new Core(javaFrame, player1, player2, 5);
 
 		// setup the mouse listening
 		InputAdapter ml = new InputAdapter();

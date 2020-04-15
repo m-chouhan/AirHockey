@@ -11,7 +11,7 @@ public class Player implements NetworkInterface {
 
     public Body master, slave;
     public final int id;
-    int score;
+    public int score;
     public Player(int id) { this.id = id; }
 
     public void setPosition(float x, float y) {
@@ -28,11 +28,16 @@ public class Player implements NetworkInterface {
         sfsObject.putInt("id", id);
         sfsObject.putFloat("x", (float) master.getTransform().getTranslationX());
         sfsObject.putFloat("y", (float) master.getTransform().getTranslationY());
+        sfsObject.putInt("score", score);
         return sfsObject;
     }
 
     @Override
     public String toString() {
         return "{ id=" + id +", ("+ master.getTransform().getTranslationX() + ","+ master.getTransform().getTranslationY() + "), " + score + " }";
+    }
+
+    public void updateScore() {
+        score++;
     }
 }

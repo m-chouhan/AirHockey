@@ -7,6 +7,7 @@ import com.airhockey.handlers.MovementHandler;
 import com.airhockey.handlers.ReadyHandler;
 import com.smartfoxserver.v2.SmartFoxServer;
 import com.smartfoxserver.v2.entities.User;
+import com.smartfoxserver.v2.entities.data.ISFSObject;
 import com.smartfoxserver.v2.entities.data.SFSObject;
 import com.smartfoxserver.v2.extensions.SFSExtension;
 import org.dyn4j.dynamics.Body;
@@ -15,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 public class AirHockeyExtension extends SFSExtension implements ApplicationWrapper {
 
@@ -36,11 +36,11 @@ public class AirHockeyExtension extends SFSExtension implements ApplicationWrapp
         List<Integer> userIds = new ArrayList<>();
         for(User user : userList)
             userIds.add(user.getId());
-        //userIds.add(100); //dummy id
+//        userIds.add(100); //dummy id for testing purposes
 
         Player player1 = new Player(userIds.get(0));
         Player player2 = new Player(userIds.get(1));
-        game = new Core(this, player1, player2);
+        game = new Core(this, player1, player2, 3);
 
         SFSObject sfsObject = game.getState().toNetworkObj();
         sfsObject.putIntArray("userIds", userIds);
@@ -49,7 +49,7 @@ public class AirHockeyExtension extends SFSExtension implements ApplicationWrapp
 
         send("start", sfsObject, userList);
         // Schedule task: executes the game logic on the same frame basis (25 fps) used by the Flash client
-        gameTask = sfs.getTaskScheduler().scheduleAtFixedRate(game, 100, 10, TimeUnit.MILLISECONDS);
+        gameTask = sfs.getTaskScheduler().scheduleAtFixedRate(game, 100, 15, TimeUnit.MILLISECONDS);
     }
 
     public Core getGame() { return game; }
@@ -68,10 +68,32 @@ public class AirHockeyExtension extends SFSExtension implements ApplicationWrapp
 
     @Override
     public void render(GameState state, List<Body> bodies) {
-        send("move", state.toNetworkObj(), getParentRoom().getUserList());
+        //only thing we need to send here is puck position
+        SFSObject resp = new SFSObject();
+        SFSObject puckPos = new SFSObject();
+        puckPos.putFloat("x", (float) state.puck.getTransform().getTranslationX());
+        puckPos.putFloat("y", (float) state.puck.getTransform().getTranslationY());
+        resp.putSFSObject("puck", puckPos);
+        send("move", resp, getParentRoom().getUserList());
     }
 
     //TODO ::
     @Override
-    public void endGame(Player winner) { }
+    public void endGame(Player winner) {
+        SFSObject response = new SFSObject();
+        response.putInt("id", winner.id);
+        send("end", response, getParentRoom().getUserList());
+    }
+
+    @Override
+    public void scoreUpdated(Player striker) {
+        SFSObject resp = new SFSObject();
+        resp.putInt(String.valueOf(striker.id), striker.score);
+        send("updateScore", resp, getParentRoom().getUserList());
+    }
+
+    @Override
+    public void resetGame(GameState state) {
+        send("reset", state.toNetworkObj(), getParentRoom().getUserList());
+    }
 }
