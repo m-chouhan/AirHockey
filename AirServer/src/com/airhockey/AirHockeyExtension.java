@@ -5,9 +5,9 @@ import com.airhockey.entities.GameState;
 import com.airhockey.entities.Player;
 import com.airhockey.handlers.MovementHandler;
 import com.airhockey.handlers.ReadyHandler;
+import com.airhockey.handlers.UdpTest;
 import com.smartfoxserver.v2.SmartFoxServer;
 import com.smartfoxserver.v2.entities.User;
-import com.smartfoxserver.v2.entities.data.ISFSObject;
 import com.smartfoxserver.v2.entities.data.SFSObject;
 import com.smartfoxserver.v2.extensions.SFSExtension;
 import org.dyn4j.dynamics.Body;
@@ -22,11 +22,13 @@ public class AirHockeyExtension extends SFSExtension implements ApplicationWrapp
     private SmartFoxServer sfs;
     private ScheduledFuture<?> gameTask;
     private Core game;
+
     @Override
     public void init() {
         trace("mahendra in AirHockeyExtension init");
         this.addRequestHandler("ready", ReadyHandler.class);
         this.addRequestHandler("move", MovementHandler.class);
+        this.addRequestHandler("udpTest", UdpTest.class);
         sfs = SmartFoxServer.getInstance();
     }
 
@@ -49,7 +51,7 @@ public class AirHockeyExtension extends SFSExtension implements ApplicationWrapp
 
         send("start", sfsObject, userList);
         // Schedule task: executes the game logic on the same frame basis (25 fps) used by the Flash client
-        gameTask = sfs.getTaskScheduler().scheduleAtFixedRate(game, 100, 25, TimeUnit.MILLISECONDS);
+        gameTask = sfs.getTaskScheduler().scheduleAtFixedRate(game, 100, 5, TimeUnit.MILLISECONDS);
     }
 
     public Core getGame() { return game; }

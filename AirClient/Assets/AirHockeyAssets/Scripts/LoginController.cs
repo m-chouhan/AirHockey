@@ -4,6 +4,9 @@ using UnityEngine.SceneManagement;
 using Sfs2X;
 using Sfs2X.Util;
 using Sfs2X.Core;
+using System;
+using Sfs2X.Requests;
+using Sfs2X.Entities.Data;
 
 public class LoginController : MonoBehaviour {
 
@@ -17,7 +20,10 @@ public class LoginController : MonoBehaviour {
 	[Tooltip("TCP port listened by the SmartFoxServer 2X instance; used for regular socket connection in all builds except WebGL")]
 	public int TcpPort = 9933;
 
-	[Tooltip("WebSocket port listened by the SmartFoxServer 2X instance; used for in WebGL build only")]
+    [Tooltip("TCP port listened by the SmartFoxServer 2X instance; used for regular socket connection in all builds except WebGL")]
+    public int UdpPort = 9934;
+
+    [Tooltip("WebSocket port listened by the SmartFoxServer 2X instance; used for in WebGL build only")]
 	public int WSPort = 8080;
 
 	[Tooltip("Name of the SmartFoxServer 2X Zone to join")]
@@ -147,13 +153,28 @@ public class LoginController : MonoBehaviour {
 	private void OnLogin(BaseEvent evt) {
 		// Remove SFS2X listeners and re-enable interface
 		reset();
-
-		// Load lobby scene
-		//Application.LoadLevel("Lobby");
-		SceneManager.LoadScene("Lobby");
+        sfs.AddEventListener(SFSEvent.UDP_INIT, OnUDPInit);
+        sfs.InitUDP(Host, UdpPort);
+        // Load lobby scene
+        //Application.LoadLevel("Lobby");
+        SceneManager.LoadScene("Lobby");
 	}
-	
-	private void OnLoginError(BaseEvent evt) {
+
+    private void OnUDPInit(BaseEvent evt)
+    {
+        if ((bool)evt.Params["success"])
+        {
+            Debug.Log("Udp init success!!");
+            // Execute an extension call via UDP
+            sfs.Send(new ExtensionRequest("udpTest", new SFSObject(), null, true));
+        }
+        else
+        {
+            Debug.Log("UDP init failed!");                          // .Net / Unity
+        }
+    }
+
+    private void OnLoginError(BaseEvent evt) {
 		// Disconnect
 		sfs.Disconnect();
 
