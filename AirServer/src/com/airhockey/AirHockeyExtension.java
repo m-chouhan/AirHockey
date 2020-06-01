@@ -5,7 +5,6 @@ import com.airhockey.entities.GameState;
 import com.airhockey.entities.Player;
 import com.airhockey.handlers.MovementHandler;
 import com.airhockey.handlers.ReadyHandler;
-import com.airhockey.handlers.UdpTest;
 import com.smartfoxserver.v2.SmartFoxServer;
 import com.smartfoxserver.v2.entities.User;
 import com.smartfoxserver.v2.entities.data.SFSObject;
@@ -28,7 +27,6 @@ public class AirHockeyExtension extends SFSExtension implements ApplicationWrapp
         trace("mahendra in AirHockeyExtension init");
         this.addRequestHandler("ready", ReadyHandler.class);
         this.addRequestHandler("move", MovementHandler.class);
-        this.addRequestHandler("udpTest", UdpTest.class);
         sfs = SmartFoxServer.getInstance();
     }
 
@@ -51,7 +49,7 @@ public class AirHockeyExtension extends SFSExtension implements ApplicationWrapp
 
         send("start", sfsObject, userList);
         // Schedule task: executes the game logic on the same frame basis (25 fps) used by the Flash client
-        gameTask = sfs.getTaskScheduler().scheduleAtFixedRate(game, 100, 5, TimeUnit.MILLISECONDS);
+        gameTask = sfs.getTaskScheduler().scheduleAtFixedRate(game, 100, 10, TimeUnit.MILLISECONDS);
     }
 
     public Core getGame() { return game; }
@@ -66,7 +64,9 @@ public class AirHockeyExtension extends SFSExtension implements ApplicationWrapp
     }
 
     @Override
-    public void print(String s) { trace(s); }
+    public void print(String s) {
+        //trace(s);
+    }
 
     @Override
     public void render(GameState state, List<Body> bodies) {
@@ -95,7 +95,7 @@ public class AirHockeyExtension extends SFSExtension implements ApplicationWrapp
                 playerPos.putFloat("y", (float) state.player2.slave.getTransform().getTranslationY());
                 resp.putSFSObject(String.valueOf(state.player2.id), playerPos);
             }
-            send("move", resp, player1);
+            send("move", resp, player1, true);
         }
 
         if(player2 != null) {
@@ -107,7 +107,7 @@ public class AirHockeyExtension extends SFSExtension implements ApplicationWrapp
                 playerPos.putFloat("y", (float) state.player1.slave.getTransform().getTranslationY());
                 resp.putSFSObject(String.valueOf(state.player1.id), playerPos);
             }
-            send("move", resp, player2);
+            send("move", resp, player2, true);
         }
     }
 
