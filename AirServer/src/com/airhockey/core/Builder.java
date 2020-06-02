@@ -1,6 +1,7 @@
 package com.airhockey.core;
 
 import com.airhockey.entities.Player;
+import com.airhockey.entities.Puck;
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.World;
 import org.dyn4j.dynamics.joint.MotorJoint;
@@ -77,9 +78,9 @@ public class Builder {
         player.slave = slave;
     }
 
-    public static Body createPuck(int x, int y, World world) {
+    public static Puck createPuck(int x, int y, World world) {
 
-        Body circle = new Body();
+        Puck circle = new Puck();
         circle.addFixture(Geometry.createCircle(scale));
         circle.setMass(MassType.NORMAL);
         circle.setAngularDamping(1);

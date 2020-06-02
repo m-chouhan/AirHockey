@@ -9,9 +9,9 @@ import org.dyn4j.dynamics.Body;
  */
 public class GameState implements NetworkInterface {
     public Player player1, player2;
-    public Body puck;
+    public Puck puck;
 
-    public GameState(Player p1, Player p2, Body puck) {
+    public GameState(Player p1, Player p2, Puck puck) {
         this.player1 = p1;
         this.player2 = p2;
         this.puck = puck;

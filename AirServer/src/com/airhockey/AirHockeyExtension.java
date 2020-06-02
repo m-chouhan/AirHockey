@@ -70,6 +70,7 @@ public class AirHockeyExtension extends SFSExtension implements ApplicationWrapp
 
     @Override
     public void render(GameState state, List<Body> bodies) {
+        
         //only thing we need to send here is puck position
         List<User> users = getParentRoom().getUserList();
 
@@ -82,10 +83,33 @@ public class AirHockeyExtension extends SFSExtension implements ApplicationWrapp
                         .findAny()
                         .orElse(null);
 
-        SFSObject puckPos = new SFSObject();
-        puckPos.putFloat("x", (float) state.puck.getTransform().getTranslationX());
-        puckPos.putFloat("y", (float) state.puck.getTransform().getTranslationY());
+        SFSObject resp = new SFSObject();
+        if(state.puck.isDirty()) {
+            SFSObject puckPos = new SFSObject();
+            puckPos.putFloat("x", (float) state.puck.getTransform().getTranslationX());
+            puckPos.putFloat("y", (float) state.puck.getTransform().getTranslationY());
+            resp.putSFSObject("puck", puckPos);
+        }
+        //if(player1 != null) {
+        if(state.player2.isDirty()) {
+                SFSObject playerPos = new SFSObject();
+                playerPos.putFloat("x", (float) state.player2.slave.getTransform().getTranslationX());
+                playerPos.putFloat("y", (float) state.player2.slave.getTransform().getTranslationY());
+                resp.putSFSObject(String.valueOf(state.player2.id), playerPos);
+        }
+        //}
+        //if(player2 != null) {
+        if(state.player1.isDirty()) {
+                SFSObject playerPos = new SFSObject();
+                playerPos.putFloat("x", (float) state.player1.slave.getTransform().getTranslationX());
+                playerPos.putFloat("y", (float) state.player1.slave.getTransform().getTranslationY());
+                resp.putSFSObject(String.valueOf(state.player1.id), playerPos);
+        }
 
+        if(resp.size() > 0) send("move", resp, users);
+        //}
+
+        /*
         if(player1 != null) {
             SFSObject resp = new SFSObject();
             resp.putSFSObject("puck", puckPos);
@@ -94,6 +118,7 @@ public class AirHockeyExtension extends SFSExtension implements ApplicationWrapp
                 playerPos.putFloat("x", (float) state.player2.slave.getTransform().getTranslationX());
                 playerPos.putFloat("y", (float) state.player2.slave.getTransform().getTranslationY());
                 resp.putSFSObject(String.valueOf(state.player2.id), playerPos);
+
             }
             send("move", resp, player1, true);
         }
@@ -108,7 +133,7 @@ public class AirHockeyExtension extends SFSExtension implements ApplicationWrapp
                 resp.putSFSObject(String.valueOf(state.player1.id), playerPos);
             }
             send("move", resp, player2, true);
-        }
+        } */
     }
 
     //TODO ::

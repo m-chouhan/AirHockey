@@ -3,6 +3,7 @@ package com.airhockey.core;
 import com.airhockey.ApplicationWrapper;
 import com.airhockey.entities.GameState;
 import com.airhockey.entities.Player;
+import com.airhockey.entities.Puck;
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.World;
 import org.dyn4j.geometry.Vector2;
@@ -32,7 +33,7 @@ public class Core implements Runnable {
         this.world = Builder.setupWorld(Width, Height);
         Builder.incarnate(player1, -Width/2, 0, world);
         Builder.incarnate(player2, Width/2, 0, world);
-        Body puck = Builder.createPuck( -4, -2, world);
+        Puck puck = Builder.createPuck( -4, -2, world);
         state = new GameState(player1, player2, puck);
         resetGame(state);
 
@@ -71,7 +72,8 @@ public class Core implements Runnable {
         //3. render
         appWrapper.print(state.toString());
         // network broadcast ? show in ui ? do whatever you want :P
-        appWrapper.render(state, world.getBodies());
+        //TODO : 2nd parameter should not be mandatory, getting unmodifiable list is heavy
+        appWrapper.render(state, null);
     }
 
     private void resetGame(GameState state) {
