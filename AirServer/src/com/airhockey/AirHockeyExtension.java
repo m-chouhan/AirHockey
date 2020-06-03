@@ -7,7 +7,6 @@ import com.airhockey.handlers.MovementHandler;
 import com.airhockey.handlers.ReadyHandler;
 import com.smartfoxserver.v2.SmartFoxServer;
 import com.smartfoxserver.v2.entities.User;
-import com.smartfoxserver.v2.entities.data.ISFSObject;
 import com.smartfoxserver.v2.entities.data.SFSObject;
 import com.smartfoxserver.v2.extensions.SFSExtension;
 import org.dyn4j.dynamics.Body;
@@ -22,6 +21,7 @@ public class AirHockeyExtension extends SFSExtension implements ApplicationWrapp
     private SmartFoxServer sfs;
     private ScheduledFuture<?> gameTask;
     private Core game;
+
     @Override
     public void init() {
         trace("mahendra in AirHockeyExtension init");
@@ -49,7 +49,7 @@ public class AirHockeyExtension extends SFSExtension implements ApplicationWrapp
 
         send("start", sfsObject, userList);
         // Schedule task: executes the game logic on the same frame basis (25 fps) used by the Flash client
-        gameTask = sfs.getTaskScheduler().scheduleAtFixedRate(game, 100, 25, TimeUnit.MILLISECONDS);
+        gameTask = sfs.getTaskScheduler().scheduleAtFixedRate(game, 100, 10, TimeUnit.MILLISECONDS);
     }
 
     public Core getGame() { return game; }
@@ -64,10 +64,13 @@ public class AirHockeyExtension extends SFSExtension implements ApplicationWrapp
     }
 
     @Override
-    public void print(String s) { trace(s); }
+    public void print(String s) {
+        //trace(s);
+    }
 
     @Override
     public void render(GameState state, List<Body> bodies) {
+        
         //only thing we need to send here is puck position
         List<User> users = getParentRoom().getUserList();
 
@@ -80,10 +83,33 @@ public class AirHockeyExtension extends SFSExtension implements ApplicationWrapp
                         .findAny()
                         .orElse(null);
 
-        SFSObject puckPos = new SFSObject();
-        puckPos.putFloat("x", (float) state.puck.getTransform().getTranslationX());
-        puckPos.putFloat("y", (float) state.puck.getTransform().getTranslationY());
+        SFSObject resp = new SFSObject();
+        if(state.puck.isDirty()) {
+            SFSObject puckPos = new SFSObject();
+            puckPos.putFloat("x", (float) state.puck.getTransform().getTranslationX());
+            puckPos.putFloat("y", (float) state.puck.getTransform().getTranslationY());
+            resp.putSFSObject("puck", puckPos);
+        }
+        //if(player1 != null) {
+        if(state.player2.isDirty()) {
+                SFSObject playerPos = new SFSObject();
+                playerPos.putFloat("x", (float) state.player2.slave.getTransform().getTranslationX());
+                playerPos.putFloat("y", (float) state.player2.slave.getTransform().getTranslationY());
+                resp.putSFSObject(String.valueOf(state.player2.id), playerPos);
+        }
+        //}
+        //if(player2 != null) {
+        if(state.player1.isDirty()) {
+                SFSObject playerPos = new SFSObject();
+                playerPos.putFloat("x", (float) state.player1.slave.getTransform().getTranslationX());
+                playerPos.putFloat("y", (float) state.player1.slave.getTransform().getTranslationY());
+                resp.putSFSObject(String.valueOf(state.player1.id), playerPos);
+        }
 
+        if(resp.size() > 0) send("move", resp, users);
+        //}
+
+        /*
         if(player1 != null) {
             SFSObject resp = new SFSObject();
             resp.putSFSObject("puck", puckPos);
@@ -92,8 +118,9 @@ public class AirHockeyExtension extends SFSExtension implements ApplicationWrapp
                 playerPos.putFloat("x", (float) state.player2.slave.getTransform().getTranslationX());
                 playerPos.putFloat("y", (float) state.player2.slave.getTransform().getTranslationY());
                 resp.putSFSObject(String.valueOf(state.player2.id), playerPos);
+
             }
-            send("move", resp, player1);
+            send("move", resp, player1, true);
         }
 
         if(player2 != null) {
@@ -105,8 +132,8 @@ public class AirHockeyExtension extends SFSExtension implements ApplicationWrapp
                 playerPos.putFloat("y", (float) state.player1.slave.getTransform().getTranslationY());
                 resp.putSFSObject(String.valueOf(state.player1.id), playerPos);
             }
-            send("move", resp, player2);
-        }
+            send("move", resp, player2, true);
+        } */
     }
 
     //TODO ::

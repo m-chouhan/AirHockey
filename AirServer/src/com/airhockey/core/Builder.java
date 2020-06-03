@@ -1,6 +1,7 @@
 package com.airhockey.core;
 
 import com.airhockey.entities.Player;
+import com.airhockey.entities.Puck;
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.World;
 import org.dyn4j.dynamics.joint.MotorJoint;
@@ -9,6 +10,8 @@ import org.dyn4j.geometry.Geometry;
 import org.dyn4j.geometry.MassType;
 
 public class Builder {
+
+    private static float scale = 1f;
 
     public static Body createObstacle(float x, float y, float width, float height) {
         Body wall = new Body();
@@ -50,7 +53,7 @@ public class Builder {
 
         // player control setup
         Body master = new Body();
-        Circle fixture = Geometry.createCircle(0.1);
+        Circle fixture = Geometry.createCircle(0.02);
         master.addFixture(fixture);
         master.setAngularDamping(1);
         master.setMass(MassType.INFINITE);
@@ -58,7 +61,7 @@ public class Builder {
         world.addBody(master);
 
         Body slave = new Body();
-        slave.addFixture(Geometry.createCircle(0.65));
+        slave.addFixture(Geometry.createCircle(scale));
         slave.setMass(MassType.NORMAL);
         slave.setAngularDamping(1);
         slave.setAutoSleepingEnabled(false);
@@ -75,10 +78,10 @@ public class Builder {
         player.slave = slave;
     }
 
-    public static Body createPuck(int x, int y, World world) {
+    public static Puck createPuck(int x, int y, World world) {
 
-        Body circle = new Body();
-        circle.addFixture(Geometry.createCircle(0.6));
+        Puck circle = new Puck();
+        circle.addFixture(Geometry.createCircle(scale));
         circle.setMass(MassType.NORMAL);
         circle.setAngularDamping(1);
         circle.setAutoSleepingEnabled(false);

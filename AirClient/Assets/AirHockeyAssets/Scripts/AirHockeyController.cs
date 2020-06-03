@@ -176,7 +176,7 @@ public class AirHockeyController : MonoBehaviour
     }
 
     public void UpdatePlayerPosition(Player player) {
-        sfs.Send(new ExtensionRequest("move", player.ToSFS(), sfs.LastJoinedRoom));
+        sfs.Send(new ExtensionRequest("move", player.ToSFS(), sfs.LastJoinedRoom, true));
     }
 
     private void reset()
