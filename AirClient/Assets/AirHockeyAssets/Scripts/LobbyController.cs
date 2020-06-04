@@ -68,8 +68,8 @@ public class LobbyController : MonoBehaviour {
 		// Join the Room
 		sfs.Send(new Sfs2X.Requests.JoinRoomRequest(roomId));
 	}
-
-	public void OnStartNewGameButtonClick() {
+    	
+    public void OnStartNewGameButtonClick() {
 		// Configure Game Room
 		RoomSettings settings = new RoomSettings(sfs.MySelf.Name + "'s game");
 		settings.GroupId = "default";

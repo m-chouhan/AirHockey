@@ -25,8 +25,9 @@ public class LoginController : MonoBehaviour {
 
     public TMP_InputField inputField;
     public TMP_Text errorText;
+    public GameObject loginView;
 
-	private SmartFox sfs;
+    private SmartFox sfs;
 
 	void Awake() {
 		Application.runInBackground = true;
@@ -37,7 +38,12 @@ public class LoginController : MonoBehaviour {
 			sfs.ProcessEvents();
 	}
 
-	public void OnLoginButtonClick() {		
+    public void ToggleLoginView()
+    {
+        loginView.SetActive(!loginView.activeSelf);
+    }
+
+    public void OnLoginButtonClick() {		
 		ConfigData cfg = new ConfigData();
 		cfg.Host = Host;
 		cfg.Port = TcpPort;
