@@ -31,6 +31,7 @@ public class LoginController : MonoBehaviour {
 
 	void Awake() {
 		Application.runInBackground = true;
+        inputField.text = PlayerPrefs.GetString("name");
 	}
 	
 	void Update() {
@@ -72,6 +73,7 @@ public class LoginController : MonoBehaviour {
 			Debug.Log("Connection mode is: " + sfs.ConnectionMode);
 			SmartFoxConnection.Connection = sfs;
             Debug.Log("Trying to login as " + inputField.text);
+            PlayerPrefs.SetString("name", inputField.text);
 			sfs.Send(new LoginRequest(inputField.text));
 		}
 		else
