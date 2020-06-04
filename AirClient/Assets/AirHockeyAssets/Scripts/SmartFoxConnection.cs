@@ -1,10 +1,6 @@
 using UnityEngine;
 using Sfs2X;
 
-/**
- * Singleton class with static fields to hold a reference to SmartFoxServer connection.
- * It is useful to access the SmartFox class from anywhere in the game.
- */
 public class SmartFoxConnection : MonoBehaviour
 {
 	private static SmartFoxConnection mInstance; 
@@ -31,8 +27,6 @@ public class SmartFoxConnection : MonoBehaviour
 		}
 	}
 	
-	// Handle disconnection automagically
-	// ** Important for Windows users - can cause crashes otherwise
 	void OnApplicationQuit() { 
 		if (sfs.IsConnected) {
 			sfs.Disconnect();
