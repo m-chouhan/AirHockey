@@ -54,7 +54,8 @@ public class LoginController : MonoBehaviour {
     	
 	private void reset() {
 		// Remove SFS2X listeners
-		// This should be called when switching scenes, so events from the server do not trigger code in this scene
+		// This should be called when switching scenes, 
+        // so events from the server do not trigger code in this scene
 		sfs.RemoveAllEventListeners();		
 	}
 
@@ -63,37 +64,26 @@ public class LoginController : MonoBehaviour {
 		{
 			Debug.Log("SFS2X API version: " + sfs.Version);
 			Debug.Log("Connection mode is: " + sfs.ConnectionMode);
-
-			// Save reference to SmartFox instance; it will be used in the other scenes
 			SmartFoxConnection.Connection = sfs;
             Debug.Log("Trying to login as " + inputField.text);
-			// Login
 			sfs.Send(new LoginRequest(inputField.text));
 		}
 		else
 		{
-			// Remove SFS2X listeners and re-enable interface
 			reset();
-
-			// Show error message
 			errorText.text = "Connection failed; is the server running at all?";
 		}
 	}
 	
 	private void OnConnectionLost(BaseEvent evt) {
-		// Remove SFS2X listeners and re-enable interface
 		reset();
-
 		string reason = (string) evt.Params["reason"];
-
 		if (reason != ClientDisconnectionReason.MANUAL) {
-			// Show error message
 			errorText.text = "Connection was lost; reason is: " + reason;
 		}
 	}
 	
 	private void OnLogin(BaseEvent evt) {
-		// Remove SFS2X listeners and re-enable interface
 		reset();
         sfs.AddEventListener(SFSEvent.UDP_INIT, OnUDPInit);
         sfs.InitUDP(Host, UdpPort);
@@ -104,7 +94,6 @@ public class LoginController : MonoBehaviour {
         if ((bool)evt.Params["success"])
         {
             Debug.Log("Udp init success!!");
-            // Load lobby scene
             SceneManager.LoadScene("Lobby");
         }
         else
@@ -115,11 +104,8 @@ public class LoginController : MonoBehaviour {
     }
 
     private void OnLoginError(BaseEvent evt) {
-		// Disconnect
 		sfs.Disconnect();
-		// Remove SFS2X listeners and re-enable interface
 		reset();		
-		// Show error message
 		errorText.text = "Login failed: " + (string) evt.Params["errorMessage"];
 	}
 }

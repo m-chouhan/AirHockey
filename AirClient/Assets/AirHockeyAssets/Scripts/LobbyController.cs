@@ -7,31 +7,19 @@ using Sfs2X;
 using Sfs2X.Core;
 using Sfs2X.Entities;
 using Sfs2X.Requests;
+using TMPro;
 
 public class LobbyController : MonoBehaviour {
 
-	//----------------------------------------------------------
-	// UI elements
-	//----------------------------------------------------------
-
-	public Text loggedInText;
-	public Transform gameListContent;
-	public GameObject gameListItem;
-
-	//----------------------------------------------------------
-	// Private properties
-	//----------------------------------------------------------
+	public TMP_Text loggedInText;
+	public Transform listContainer;
+	public GameObject listItem;
 
 	private const string EXTENSION_ID = "AirHockey";
 	private const string EXTENSION_CLASS = "com.airhockey.AirHockeyExtension";
-    //private const string EXTENSION_CLASS = "sfs2x.extensions.games.tris.TrisExtension";
 
     private SmartFox sfs;
 	private bool shuttingDown;
-
-	//----------------------------------------------------------
-	// Unity calback methods
-	//----------------------------------------------------------
 
 	void Awake() {
 		Application.runInBackground = true;
@@ -57,7 +45,6 @@ public class LobbyController : MonoBehaviour {
 		// Populate list of available games
 		populateGamesList();
 
-
 		// Join the lobby Room (must exist in the Zone!)
 		sfs.Send(new JoinRoomRequest("The Lobby"));
 	}
@@ -71,11 +58,6 @@ public class LobbyController : MonoBehaviour {
 	void OnApplicationQuit() {
 		shuttingDown = true;
 	}
-
-	//----------------------------------------------------------
-	// Public interface methods for UI
-	//----------------------------------------------------------
-
     
 	public void OnLogoutButtonClick() {
 		// Disconnect from server
@@ -100,10 +82,6 @@ public class LobbyController : MonoBehaviour {
 		sfs.Send(new CreateRoomRequest(settings, true, sfs.LastJoinedRoom));
 	}
 
-	//----------------------------------------------------------
-	// Private helper methods
-	//----------------------------------------------------------
-	
 	private void reset() {
 		// Remove SFS2X listeners
 		sfs.RemoveAllEventListeners();
@@ -124,34 +102,34 @@ public class LobbyController : MonoBehaviour {
 
 			int roomId = room.Id;
 
-			GameObject newListItem = Instantiate(gameListItem) as GameObject;
-			GameListItem roomItem = newListItem.GetComponent<GameListItem>();
-			roomItem.nameLabel.text = room.Name;
+			GameObject newListItem = Instantiate(listItem) as GameObject;
+			ListItem roomItem = newListItem.GetComponent<ListItem>();
+			roomItem.label.text = room.Name;
 			roomItem.roomId = roomId;
-
 			roomItem.button.onClick.AddListener(() => OnGameItemClick(roomId));
-
-			newListItem.transform.SetParent(gameListContent, false);
+			newListItem.transform.SetParent(listContainer, false);
 		}
-	}
+        /*
+        GameObject testListItem = Instantiate(listItem) as GameObject;
+        GameListItem item = testListItem.GetComponent<GameListItem>();
+        item.nameLabel.text = "random";
+        item.roomId = 1234;
+        item.button.onClick.AddListener(() => OnGameItemClick(1234));
+        testListItem.transform.SetParent(listContainer, false);
+        */       
+    }
 
-	private void clearGamesList() {
-		foreach (Transform child in gameListContent.transform) {
+    private void clearGamesList() {
+		foreach (Transform child in listContainer.transform) {
 			GameObject.Destroy(child.gameObject);
 		}
 	}
-
-	//----------------------------------------------------------
-	// SmartFoxServer event listeners
-	//----------------------------------------------------------
-	
+    	
 	private void OnConnectionLost(BaseEvent evt) {
 		// Remove SFS2X listeners
 		reset();
-
 		if (shuttingDown == true)
 			return;
-
 		// Return to login scene
 		SceneManager.LoadScene("Login");
 	}
@@ -160,23 +138,21 @@ public class LobbyController : MonoBehaviour {
 		Room room = (Room) evt.Params["room"];
 		// If we joined a Game Room, then we either created it (and auto joined) or manually selected a game to join
 		if (room.IsGame) {
-			// Remove SFS2X listeners
 			reset ();
-			// Load game scene
 			SceneManager.LoadScene("AirHockey");
 		} 
 	}
 	
 	private void OnRoomJoinError(BaseEvent evt) {
 		// Show error message
-		printSystemMessage("Room join failed: " + (string) evt.Params["errorMessage"]);
+		Debug.Log("Room join failed: " + (string) evt.Params["errorMessage"]);
 	}
 		
 	private void OnUserEnterRoom(BaseEvent evt) {
 		User user = (User) evt.Params["user"];
 
 		// Show system message
-		printSystemMessage("User " + user.Name + " entered the room");
+		Debug.Log("User " + user.Name + " entered the room");
 	}
 	
 	private void OnUserExitRoom(BaseEvent evt) {
@@ -184,7 +160,7 @@ public class LobbyController : MonoBehaviour {
 
 		if (user != sfs.MySelf) {
 			// Show system message
-			printSystemMessage("User " + user.Name + " left the room");
+			Debug.Log("User " + user.Name + " left the room");
 		}
 	}
 
@@ -203,8 +179,4 @@ public class LobbyController : MonoBehaviour {
 		clearGamesList();
 		populateGamesList();
 	}
-
-    public void printSystemMessage(String message) {
-        Debug.Log(message);
-    }
 }

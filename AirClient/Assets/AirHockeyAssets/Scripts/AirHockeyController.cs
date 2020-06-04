@@ -9,12 +9,13 @@ using TMPro;
 
 public class AirHockeyController : MonoBehaviour
 {
-    private SmartFox sfs;
-    public GameObject playerPrefab;
+    public GameObject playerAPrefab;
+    public GameObject playerBPrefab;
     public GameObject puckPrefab;
     public GameObject gameWonPanel;
     public GameObject gameLosePanel;
 
+    private SmartFox sfs;
     private Player current, other;
     private Puck puck;
 
@@ -102,8 +103,8 @@ public class AirHockeyController : MonoBehaviour
             case "start":
                 Debug.Log("ext response : " + cmd);
                 // Setup my properties
-                GameObject player1 = Instantiate(playerPrefab);
-                GameObject player2 = Instantiate(playerPrefab);
+                GameObject player1 = Instantiate(playerAPrefab);
+                GameObject player2 = Instantiate(playerBPrefab);
                 GameObject puckGO = Instantiate(puckPrefab);
                 GameObject scoreLeft = GameObject.Find("scoreLeft");
                 GameObject scoreRight = GameObject.Find("scoreRight");
