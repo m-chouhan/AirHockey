@@ -147,10 +147,7 @@ public class PhyTestApp extends SimulationFrame implements ApplicationWrapper {
 	 */
 	public static void main(String[] args) {
 
-		if(args.length > 0) {
-			System.out.println("This is server only build, hence not running the simulation");
-			return;
-		};
+		System.out.println("Hello, our enviornment is " + System.getenv("ENV"));
 
 		Player player1 = new Player(10);
 		Player player2 = new Player(20);

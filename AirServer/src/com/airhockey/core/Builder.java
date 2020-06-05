@@ -9,6 +9,8 @@ import org.dyn4j.geometry.Circle;
 import org.dyn4j.geometry.Geometry;
 import org.dyn4j.geometry.MassType;
 
+import static org.dyn4j.geometry.MassType.FIXED_ANGULAR_VELOCITY;
+
 public class Builder {
 
     private static float scale = 1f;
@@ -62,7 +64,7 @@ public class Builder {
 
         Body slave = new Body();
         slave.addFixture(Geometry.createCircle(scale));
-        slave.setMass(MassType.NORMAL);
+        slave.setMass(FIXED_ANGULAR_VELOCITY);
         slave.setAngularDamping(1);
         slave.setAutoSleepingEnabled(false);
         world.addBody(slave);
@@ -74,6 +76,7 @@ public class Builder {
         world.addJoint(motorJoint);
 
         master.translate(x, y);
+        slave.translate(x,y);
         player.master = master;
         player.slave = slave;
     }
@@ -81,8 +84,8 @@ public class Builder {
     public static Puck createPuck(int x, int y, World world) {
 
         Puck circle = new Puck();
-        circle.addFixture(Geometry.createCircle(scale));
-        circle.setMass(MassType.NORMAL);
+        circle.addFixture(Geometry.createCircle(scale/2));
+        circle.setMass(FIXED_ANGULAR_VELOCITY);
         circle.setAngularDamping(1);
         circle.setAutoSleepingEnabled(false);
         circle.translate(x,y);

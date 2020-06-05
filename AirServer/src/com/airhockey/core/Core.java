@@ -14,39 +14,42 @@ import org.dyn4j.geometry.Vector2;
 
 public class Core implements Runnable {
 
-    final int Width = 9, Height = 5, GoalPostSize = 4;
+    final int Width = 5, Height = 10, GoalPostSize = 4;
     final ApplicationWrapper appWrapper;
     final GameState state;
     final Vector2 leftGoalPoint, rightGoalPoint;
     final World world;
     final int MaxScore;
-    private long lastUpdateTime;
     /** The conversion factor from nano to base */
     public static final double NANO_TO_BASE = 1.0e9;
+
+    private long lastUpdateTime;
+    private boolean isTestEnv = true;
+
     private boolean paused = false;
 
     //Player1 is always on the left side
     public Core(ApplicationWrapper appWrapper, Player player1, Player player2, int maxScore) {
         appWrapper.print("core game setup started!! " + Width + "," + Height);
+        isTestEnv = System.getenv("ENV") != null && System.getenv("ENV").equals("TEST");
         this.appWrapper = appWrapper;
         this.MaxScore = maxScore;
         this.world = Builder.setupWorld(Width, Height);
-        Builder.incarnate(player1, -Width/2, 0, world);
-        Builder.incarnate(player2, Width/2, 0, world);
-        Puck puck = Builder.createPuck( -4, -2, world);
+        Builder.incarnate(player1, 0, 0, world);
+        Builder.incarnate(player2, 0, 0, world);
+        Puck puck = Builder.createPuck( 0, 0, world);
         state = new GameState(player1, player2, puck);
         resetGame(state);
 
-        leftGoalPoint = new Vector2(-Width, 0);
-        rightGoalPoint = new Vector2(Width, 0);
+        leftGoalPoint = new Vector2(0, -Height);
+        rightGoalPoint = new Vector2(0, Height);
     }
 
     //Core game loop
     @Override
     public void run() {
         if(paused) return;
-
-        //1. processInput(); -> not needed
+        //1. processInput(); -> not needed here at present
         //2. update world
         long time = System.nanoTime();
         long diff = time - this.lastUpdateTime;
@@ -72,13 +75,12 @@ public class Core implements Runnable {
         //3. render
         appWrapper.print(state.toString());
         // network broadcast ? show in ui ? do whatever you want :P
-        //TODO : 2nd parameter should not be mandatory, getting unmodifiable list is heavy
-        appWrapper.render(state, null);
+        appWrapper.render(state, isTestEnv ? world.getBodies() : null);
     }
 
     private void resetGame(GameState state) {
-        state.player1.setPosition(-(float)Width/2, 0);
-        state.player2.setPosition((float)Width/2, 0);
+        state.player1.setPosition(0, -Height/2);
+        state.player2.setPosition(0, Height/2);
         state.puck.getTransform().setTranslation(0,0);
         state.puck.setLinearVelocity(0,0);
     }
