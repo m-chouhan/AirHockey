@@ -84,7 +84,7 @@ public class Player : MonoBehaviour, IClickable
     public bool capture(Vector2 touchPoint)
     {
         return touchEnabled &&
-            ((touchPoint.x < 0 && transform.position.x < 0) || (touchPoint.x >= 0 && transform.position.x >= 0));
+            ((touchPoint.y < 0 && transform.position.y < 0) || (touchPoint.y >= 0 && transform.position.y >= 0));
     }
 
     internal void SetTextComponent(TMPro.TextMeshProUGUI textMeshProUGUI)
