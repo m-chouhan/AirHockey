@@ -148,7 +148,7 @@ public class PhyTestApp extends SimulationFrame implements ApplicationWrapper {
 	public static void main(String[] args) {
 
 		System.out.println("Hello, our enviornment is " + System.getenv("ENV"));
-
+		if(System.getenv("ENV").equals("PROD")) return;
 		Player player1 = new Player(10);
 		Player player2 = new Player(20);
 		PhyTestApp.player = player1;

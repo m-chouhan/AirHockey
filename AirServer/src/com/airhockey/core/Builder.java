@@ -2,6 +2,7 @@ package com.airhockey.core;
 
 import com.airhockey.entities.Player;
 import com.airhockey.entities.Puck;
+import org.dyn4j.collision.Fixture;
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.World;
 import org.dyn4j.dynamics.joint.MotorJoint;
@@ -10,6 +11,7 @@ import org.dyn4j.geometry.Geometry;
 import org.dyn4j.geometry.MassType;
 
 import static org.dyn4j.geometry.MassType.FIXED_ANGULAR_VELOCITY;
+import static org.dyn4j.geometry.MassType.NORMAL;
 
 public class Builder {
 
@@ -17,7 +19,7 @@ public class Builder {
 
     public static Body createObstacle(float x, float y, float width, float height) {
         Body wall = new Body();
-        wall.addFixture(Geometry.createRectangle(width, height), 1, 0.2, 0.9);
+        wall.addFixture(Geometry.createRectangle(width, height), 1, 0.1, 1.15f);
         wall.setAngularDamping(1);
         wall.setMass(MassType.INFINITE);
         wall.translate(x, y);
@@ -85,11 +87,12 @@ public class Builder {
 
         Puck circle = new Puck();
         circle.addFixture(Geometry.createCircle(scale/2));
-        circle.setMass(FIXED_ANGULAR_VELOCITY);
-        circle.setAngularDamping(1);
+        circle.setMass(NORMAL);
+        circle.setAngularDamping(1f);
+        //circle.getFixture(0).setRestitution(1f);
         circle.setAutoSleepingEnabled(false);
         circle.translate(x,y);
         world.addBody(circle);
-        return circle;
+            return circle;
     }
 }
