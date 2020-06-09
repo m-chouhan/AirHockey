@@ -78,8 +78,8 @@ public class Player : MonoBehaviour, IClickable
             AirHockeyController.Instance.UpdatePlayerPosition(this);
         }
     }
-
-    // if capture the point only if it lies towards players touchable area
+        
+    // capture the point only if it lies towards players touchable area
     // i.e either -ve x axis or +ve x axis
     public bool capture(Vector2 touchPoint)
     {

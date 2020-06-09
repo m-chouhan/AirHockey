@@ -82,7 +82,14 @@ public class LobbyController : MonoBehaviour {
 		sfs.Send(new CreateRoomRequest(settings, true, sfs.LastJoinedRoom));
 	}
 
-	private void reset() {
+    public void OnBackButtonClick()
+    {
+        reset();
+        // Return to login scene
+        SceneManager.LoadScene("Login");
+    }
+
+    private void reset() {
 		// Remove SFS2X listeners
 		sfs.RemoveAllEventListeners();
 	}
@@ -91,12 +98,12 @@ public class LobbyController : MonoBehaviour {
 		// For the gamelist we use a scrollable area containing a separate prefab button for each Game Room
 		// Buttons are clickable to join the games
 		List<Room> rooms = sfs.RoomManager.GetRoomList();
-
+        Debug.Log("Populating game list " + rooms.Count);
 		foreach (Room room in rooms) {
 			// Show only game rooms
 			// Also password protected Rooms are skipped, to make this example simpler
 			// (protection would require an interface element to input the password)
-			if (!room.IsGame || room.IsHidden || room.IsPasswordProtected) {
+			if (!room.IsGame || room.IsJoined || room.IsHidden || room.IsPasswordProtected) {
 				continue;
 			}	
 
@@ -109,14 +116,6 @@ public class LobbyController : MonoBehaviour {
 			roomItem.button.onClick.AddListener(() => OnGameItemClick(roomId));
 			newListItem.transform.SetParent(listContainer, false);
 		}
-        /*
-        GameObject testListItem = Instantiate(listItem) as GameObject;
-        GameListItem item = testListItem.GetComponent<GameListItem>();
-        item.nameLabel.text = "random";
-        item.roomId = 1234;
-        item.button.onClick.AddListener(() => OnGameItemClick(1234));
-        testListItem.transform.SetParent(listContainer, false);
-        */       
     }
 
     private void clearGamesList() {
@@ -140,7 +139,7 @@ public class LobbyController : MonoBehaviour {
 		if (room.IsGame) {
 			reset ();
 			SceneManager.LoadScene("AirHockey");
-		} 
+		}
 	}
 	
 	private void OnRoomJoinError(BaseEvent evt) {

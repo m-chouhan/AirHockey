@@ -6,6 +6,7 @@ using Sfs2X.Entities.Data;
 using Sfs2X.Entities;
 using UnityEngine.SceneManagement;
 using TMPro;
+using System.Collections.Generic;
 
 public class AirHockeyController : MonoBehaviour
 {
@@ -14,6 +15,9 @@ public class AirHockeyController : MonoBehaviour
     public GameObject puckPrefab;
     public GameObject gameWonPanel;
     public GameObject gameLosePanel;
+    public TextMeshProUGUI scoreLeft; 
+    public TextMeshProUGUI scoreRight;
+    public Camera camera;
 
     private SmartFox sfs;
     private Player current, other;
@@ -61,6 +65,12 @@ public class AirHockeyController : MonoBehaviour
         sfs.Send(new ExtensionRequest("ready", payload, sfs.LastJoinedRoom));
     }
 
+    public void BackToLobby()
+    {
+        reset();
+        SceneManager.LoadScene("Lobby");
+    }
+
     private void OnConnectionLost(BaseEvent evt)
     {
         reset();
@@ -85,12 +95,9 @@ public class AirHockeyController : MonoBehaviour
     private void OnUserExitRoom(BaseEvent evt)
     {
         User user = (User)evt.Params["user"];
-
-        if (user != sfs.MySelf)
-        {
-            // Show system message
-            Debug.Log("User " + user.Name + " left the room");
-        }
+        // Show system message
+        Debug.Log("User " + user.Name + " left the room");
+        SceneManager.LoadScene("Lobby");
     }
 
     public void OnExtensionResponse(BaseEvent evt)
@@ -106,8 +113,6 @@ public class AirHockeyController : MonoBehaviour
                 GameObject player1 = Instantiate(playerAPrefab);
                 GameObject player2 = Instantiate(playerBPrefab);
                 GameObject puckGO = Instantiate(puckPrefab);
-                GameObject scoreLeft = GameObject.Find("scoreLeft");
-                GameObject scoreRight = GameObject.Find("scoreRight");
                 current = player1.GetComponent<Player>();
                 other = player2.GetComponent<Player>();
                 puck = puckGO.GetComponent<Puck>();
@@ -128,14 +133,15 @@ public class AirHockeyController : MonoBehaviour
                 //---
                 puck.SetPosition(dataObject);
 
-                if(current.transform.position.x < 0)
+                if(current.transform.position.y < 0)
                 {
-                    current.SetTextComponent(scoreLeft.GetComponent<TextMeshProUGUI>());
-                    other.SetTextComponent(scoreRight.GetComponent<TextMeshProUGUI>());
+                    current.SetTextComponent(scoreLeft);
+                    other.SetTextComponent(scoreRight);
                 } else
                 {
-                    current.SetTextComponent(scoreRight.GetComponent<TextMeshProUGUI>());
-                    other.SetTextComponent(scoreLeft.GetComponent<TextMeshProUGUI>());
+                    current.SetTextComponent(scoreRight);
+                    other.SetTextComponent(scoreLeft);
+                    camera.transform.rotation = Quaternion.Euler(0, 0, 180);
                 }
 
                 //score always start with 0, hence not required
@@ -182,6 +188,8 @@ public class AirHockeyController : MonoBehaviour
 
     private void reset()
     {
+        List<Room> roomList = sfs.RoomManager.GetJoinedRooms();
+        roomList.ForEach(room => sfs.Send(new LeaveRoomRequest(room)));
         sfs.RemoveAllEventListeners();
     }
 }
