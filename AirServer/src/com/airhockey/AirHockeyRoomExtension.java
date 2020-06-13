@@ -5,7 +5,9 @@ import com.airhockey.entities.GameState;
 import com.airhockey.entities.Player;
 import com.airhockey.handlers.MovementHandler;
 import com.airhockey.handlers.ReadyHandler;
+import com.airhockey.handlers.RoomEventHandler;
 import com.smartfoxserver.v2.SmartFoxServer;
+import com.smartfoxserver.v2.core.SFSEventType;
 import com.smartfoxserver.v2.entities.User;
 import com.smartfoxserver.v2.entities.data.SFSObject;
 import com.smartfoxserver.v2.extensions.SFSExtension;
@@ -16,7 +18,7 @@ import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-public class AirHockeyExtension extends SFSExtension implements ApplicationWrapper {
+public class AirHockeyRoomExtension extends SFSExtension implements ApplicationWrapper {
 
     private SmartFoxServer sfs;
     private ScheduledFuture<?> gameTask;
@@ -24,14 +26,18 @@ public class AirHockeyExtension extends SFSExtension implements ApplicationWrapp
 
     @Override
     public void init() {
-        trace("[airHockeyExtension] init");
+        trace("[AirHockeyRoomExt] init");
         this.addRequestHandler("ready", ReadyHandler.class);
         this.addRequestHandler("move", MovementHandler.class);
+        addEventHandler(SFSEventType.USER_JOIN_ROOM, RoomEventHandler.class);
+        addEventHandler(SFSEventType.USER_LEAVE_ROOM, RoomEventHandler.class);
+        addEventHandler(SFSEventType.USER_DISCONNECT, RoomEventHandler.class);
         sfs = SmartFoxServer.getInstance();
     }
 
     public void startGame() {
 
+        trace("[AirHockeyRoomExtension] starting game for " + getParentRoom().getName());
         List<User> userList = getParentRoom().getUserList();
         List<Integer> userIds = new ArrayList<>();
         for(User user : userList)
@@ -57,7 +63,7 @@ public class AirHockeyExtension extends SFSExtension implements ApplicationWrapp
     @Override
     public void destroy()
     {
-        trace("[airHockeyExtension] on destroy called " + gameTask);
+        trace("[AirHockeyRoomExt] on destroy called " + gameTask);
         if(gameTask != null)
             gameTask.cancel(true);
         gameTask = null;

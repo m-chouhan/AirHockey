@@ -16,7 +16,7 @@ public class LobbyController : MonoBehaviour {
 	public GameObject listItem;
 
 	private const string EXTENSION_ID = "AirHockey";
-	private const string EXTENSION_CLASS = "com.airhockey.AirHockeyExtension";
+	private const string EXTENSION_CLASS = "com.airhockey.AirHockeyRoomExtension";
 
     private SmartFox sfs;
 	private bool shuttingDown;
