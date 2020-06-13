@@ -24,7 +24,7 @@ public class AirHockeyExtension extends SFSExtension implements ApplicationWrapp
 
     @Override
     public void init() {
-        trace("mahendra in AirHockeyExtension init");
+        trace("[airHockeyExtension] init");
         this.addRequestHandler("ready", ReadyHandler.class);
         this.addRequestHandler("move", MovementHandler.class);
         sfs = SmartFoxServer.getInstance();
@@ -57,7 +57,7 @@ public class AirHockeyExtension extends SFSExtension implements ApplicationWrapp
     @Override
     public void destroy()
     {
-        trace("on destroy called" + gameTask);
+        trace("[airHockeyExtension] on destroy called " + gameTask);
         if(gameTask != null)
             gameTask.cancel(true);
         gameTask = null;

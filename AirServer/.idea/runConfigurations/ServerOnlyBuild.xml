@@ -1,0 +1,22 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="ServerOnlyBuild" type="Application" factoryName="Application">
+    <envs>
+      <env name="ENV" value="PROD" />
+    </envs>
+    <option name="MAIN_CLASS_NAME" value="org.dyn4j.samples.PhyTestApp" />
+    <module name="AirServer" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="org.dyn4j.samples.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+      <option name="BuildArtifacts" enabled="true">
+        <artifact name="AirServer:jar" />
+      </option>
+      <option name="ToolBeforeRunTask" enabled="true" actionId="Tool_External Tools_upload" />
+    </method>
+  </configuration>
+</component>

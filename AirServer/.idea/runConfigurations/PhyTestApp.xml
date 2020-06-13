@@ -1,0 +1,21 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="PhyTestApp" type="Application" factoryName="Application" nameIsGenerated="true">
+    <envs>
+      <env name="ENV" value="TEST" />
+    </envs>
+    <option name="MAIN_CLASS_NAME" value="org.dyn4j.samples.PhyTestApp" />
+    <module name="AirServer" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="org.dyn4j.samples.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+      <option name="BuildArtifacts" enabled="true">
+        <artifact name="AirServer:jar" />
+      </option>
+    </method>
+  </configuration>
+</component>

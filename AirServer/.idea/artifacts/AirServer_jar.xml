@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="AirServer:jar">
+    <output-path>$PROJECT_DIR$/../../SmartFoxServer_2X/SFS2X/extensions/AirHockey</output-path>
+    <root id="archive" name="AirHockeyExtension.jar">
+      <element id="module-output" name="AirServer" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../SmartFoxServer_2X/SFS2X/lib/sfs2x-core.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../SmartFoxServer_2X/SFS2X/lib/sfs2x.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/dyn4j-3.4.0.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
