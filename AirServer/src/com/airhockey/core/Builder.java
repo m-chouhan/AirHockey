@@ -19,7 +19,7 @@ public class Builder {
 
     public static Body createObstacle(float x, float y, float width, float height) {
         Body wall = new Body();
-        wall.addFixture(Geometry.createRectangle(width, height), 1, 0.1, 1.15f);
+        wall.addFixture(Geometry.createRectangle(width, height), 1, 0, 1.15f);
         wall.setAngularDamping(1);
         wall.setMass(MassType.INFINITE);
         wall.translate(x, y);
@@ -73,7 +73,7 @@ public class Builder {
 
         MotorJoint motorJoint = new MotorJoint(slave, master);
         motorJoint.setCollisionAllowed(false);
-        motorJoint.setMaximumForce(2000.0);
+        motorJoint.setMaximumForce(1500.0);
         motorJoint.setMaximumTorque(0.0);
         world.addJoint(motorJoint);
 
