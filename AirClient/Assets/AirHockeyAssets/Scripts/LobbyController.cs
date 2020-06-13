@@ -31,6 +31,8 @@ public class LobbyController : MonoBehaviour {
 			return;
 		}
 
+        Debug.Log("Coming in lobby as " + sfs.MySelf.Name);
+
 		loggedInText.text = "Logged in as " + sfs.MySelf.Name;
 		
 		// Register event listeners
@@ -65,8 +67,7 @@ public class LobbyController : MonoBehaviour {
 	}
 	
 	public void OnGameItemClick(int roomId) {
-		// Join the Room
-		sfs.Send(new Sfs2X.Requests.JoinRoomRequest(roomId));
+		sfs.Send(new JoinRoomRequest(roomId));
 	}
     	
     public void OnStartNewGameButtonClick() {
@@ -77,7 +78,6 @@ public class LobbyController : MonoBehaviour {
 		settings.MaxUsers = 2;
 		settings.MaxSpectators = 0;
 		settings.Extension = new RoomExtension(EXTENSION_ID, EXTENSION_CLASS);
-
 		// Request Game Room creation to server
 		sfs.Send(new CreateRoomRequest(settings, true, sfs.LastJoinedRoom));
 	}
@@ -85,30 +85,27 @@ public class LobbyController : MonoBehaviour {
     public void OnBackButtonClick()
     {
         reset();
-        // Return to login scene
+        sfs.Disconnect();
         SceneManager.LoadScene("Login");
     }
 
     private void reset() {
-		// Remove SFS2X listeners
 		sfs.RemoveAllEventListeners();
 	}
     	
 	private void populateGamesList() {
-		// For the gamelist we use a scrollable area containing a separate prefab button for each Game Room
-		// Buttons are clickable to join the games
 		List<Room> rooms = sfs.RoomManager.GetRoomList();
         Debug.Log("Populating game list " + rooms.Count);
 		foreach (Room room in rooms) {
+            Debug.Log(room.Name);
 			// Show only game rooms
 			// Also password protected Rooms are skipped, to make this example simpler
 			// (protection would require an interface element to input the password)
-			if (!room.IsGame || room.IsJoined || room.IsHidden || room.IsPasswordProtected) {
+			if (!room.IsGame || room.IsHidden || room.IsPasswordProtected) {
 				continue;
-			}	
+			}
 
-			int roomId = room.Id;
-
+            int roomId = room.Id;
 			GameObject newListItem = Instantiate(listItem) as GameObject;
 			ListItem roomItem = newListItem.GetComponent<ListItem>();
 			roomItem.label.text = room.Name;
@@ -120,12 +117,12 @@ public class LobbyController : MonoBehaviour {
 
     private void clearGamesList() {
 		foreach (Transform child in listContainer.transform) {
-			GameObject.Destroy(child.gameObject);
+            Destroy(child.gameObject);
 		}
 	}
     	
 	private void OnConnectionLost(BaseEvent evt) {
-		// Remove SFS2X listeners
+        Debug.Log("Connection Lost!!");
 		reset();
 		if (shuttingDown == true)
 			return;
@@ -135,47 +132,46 @@ public class LobbyController : MonoBehaviour {
 	
 	private void OnRoomJoin(BaseEvent evt) {
 		Room room = (Room) evt.Params["room"];
-		// If we joined a Game Room, then we either created it (and auto joined) or manually selected a game to join
+        Debug.Log("on room join " + room.Name);
+		// If we joined a Game Room, then 
+        // 1. we either created it (and auto joined) or 
+        // 2. manually selected a game to join
 		if (room.IsGame) {
 			reset ();
-			SceneManager.LoadScene("AirHockey");
+            Room lobbyRoom = sfs.RoomManager.GetRoomByName("The Lobby");
+            sfs.Send(new LeaveRoomRequest(lobbyRoom));
+            SceneManager.LoadScene("AirHockey");
 		}
 	}
 	
 	private void OnRoomJoinError(BaseEvent evt) {
-		// Show error message
 		Debug.Log("Room join failed: " + (string) evt.Params["errorMessage"]);
 	}
 		
 	private void OnUserEnterRoom(BaseEvent evt) {
 		User user = (User) evt.Params["user"];
-
-		// Show system message
 		Debug.Log("User " + user.Name + " entered the room");
 	}
 	
 	private void OnUserExitRoom(BaseEvent evt) {
 		User user = (User) evt.Params["user"];
-
-		if (user != sfs.MySelf) {
-			// Show system message
-			Debug.Log("User " + user.Name + " left the room");
-		}
+		Debug.Log("User " + user.Name + " left the room");
 	}
 
 	private void OnRoomAdded(BaseEvent evt) {
 		Room room = (Room) evt.Params["room"];
-
-		// Update view (only if room is game)
-		if (room.IsGame) {
+        Debug.Log("on room added " + room.Name);
+        if (room.IsGame) {
 			clearGamesList();
 			populateGamesList();
 		}
 	}
 	
 	public void OnRoomRemoved(BaseEvent evt) {
-		// Update view
-		clearGamesList();
+        Room room = (Room)evt.Params["room"];
+        Debug.Log("room removed " + room.Name);
+        // Update view
+        clearGamesList();
 		populateGamesList();
 	}
 }

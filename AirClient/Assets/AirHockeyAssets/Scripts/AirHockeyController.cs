@@ -15,9 +15,9 @@ public class AirHockeyController : MonoBehaviour
     public GameObject puckPrefab;
     public GameObject gameWonPanel;
     public GameObject gameLosePanel;
-    public TextMeshProUGUI scoreLeft; 
-    public TextMeshProUGUI scoreRight;
-    public Camera camera;
+    public TextMeshProUGUI scoreTop; 
+    public TextMeshProUGUI scoreBottom;
+    public new Camera camera;
 
     private SmartFox sfs;
     private Player current, other;
@@ -40,6 +40,7 @@ public class AirHockeyController : MonoBehaviour
         else
         {
             //no point starting the game, need to relogin
+            Debug.Log("sfs is null!!");
             SceneManager.LoadScene("Login");
             return;
         }
@@ -54,9 +55,9 @@ public class AirHockeyController : MonoBehaviour
 
     public void InitGame()
     {
+        Debug.Log("Init Game");
         //callbacks
         sfs.AddEventListener(SFSEvent.CONNECTION_LOST, OnConnectionLost);
-        sfs.AddEventListener(SFSEvent.PUBLIC_MESSAGE, OnPublicMessage);
         sfs.AddEventListener(SFSEvent.USER_ENTER_ROOM, OnUserEnterRoom);
         sfs.AddEventListener(SFSEvent.USER_EXIT_ROOM, OnUserExitRoom);
         sfs.AddEventListener(SFSEvent.EXTENSION_RESPONSE, OnExtensionResponse);
@@ -67,48 +68,42 @@ public class AirHockeyController : MonoBehaviour
 
     public void BackToLobby()
     {
+        Debug.Log("back to lobby pressed!");
         reset();
         SceneManager.LoadScene("Lobby");
     }
 
     private void OnConnectionLost(BaseEvent evt)
     {
+        Debug.Log("Connection Lost!");
+        //TODO : retry logic and pause game logic
+        //for now just exit the game
         reset();
         SceneManager.LoadScene("Login");
     }
 
-    private void OnPublicMessage(BaseEvent evt)
-    {
-        User sender = (User)evt.Params["sender"];
-        string message = (string)evt.Params["message"];
-        Debug.Log(sender.Name + "::" + message);
-    }
 
     private void OnUserEnterRoom(BaseEvent evt)
     {
         User user = (User)evt.Params["user"];
-
-        // Show system message
         Debug.Log("User " + user.Name + " entered the room");
     }
 
     private void OnUserExitRoom(BaseEvent evt)
     {
         User user = (User)evt.Params["user"];
-        // Show system message
         Debug.Log("User " + user.Name + " left the room");
+        reset();
         SceneManager.LoadScene("Lobby");
     }
 
     public void OnExtensionResponse(BaseEvent evt)
     {
         string cmd = (string)evt.Params["cmd"];
-
         SFSObject dataObject = (SFSObject)evt.Params["params"];
-
         switch (cmd) {
             case "start":
-                Debug.Log("ext response : " + cmd);
+                Debug.Log("start cmd");
                 // Setup my properties
                 GameObject player1 = Instantiate(playerAPrefab);
                 GameObject player2 = Instantiate(playerBPrefab);
@@ -132,26 +127,12 @@ public class AirHockeyController : MonoBehaviour
                 }
                 //---
                 puck.SetPosition(dataObject);
-
-                if(current.transform.position.y < 0)
+                if(current.transform.position.y > 0)
                 {
-                    current.SetTextComponent(scoreLeft);
-                    other.SetTextComponent(scoreRight);
-                } else
-                {
-                    current.SetTextComponent(scoreRight);
-                    other.SetTextComponent(scoreLeft);
                     camera.transform.rotation = Quaternion.Euler(0, 0, 180);
                 }
-
-                //score always start with 0, hence not required
-                //current.SetScore(
-                //    dataObject.GetSFSObject(current.id.ToString()).GetInt("score")
-                //);
-                //other.SetScore(
-                //    dataObject.GetSFSObject(other.id.ToString()).GetInt("score")
-                //);
-
+                current.SetTextComponent(scoreBottom);
+                other.SetTextComponent(scoreTop);
                 current.EnableTouch();
                 current.gameObject.name = "me";
                 other.gameObject.name = "other";
@@ -189,7 +170,10 @@ public class AirHockeyController : MonoBehaviour
     private void reset()
     {
         List<Room> roomList = sfs.RoomManager.GetJoinedRooms();
-        roomList.ForEach(room => sfs.Send(new LeaveRoomRequest(room)));
+        roomList.ForEach(room => {
+            Debug.Log("sending leave room request " + room.Name);
+            sfs.Send(new LeaveRoomRequest(room));
+        });
         sfs.RemoveAllEventListeners();
     }
 }

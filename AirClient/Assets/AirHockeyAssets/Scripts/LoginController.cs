@@ -8,6 +8,8 @@ using System;
 using Sfs2X.Requests;
 using Sfs2X.Entities.Data;
 using TMPro;
+using System.Collections.Generic;
+using Sfs2X.Entities;
 
 public class LoginController : MonoBehaviour {
 
@@ -58,12 +60,15 @@ public class LoginController : MonoBehaviour {
 		// Connect to SFS2X
 		sfs.Connect(cfg);
 	}
-    	
-	private void reset() {
-		// Remove SFS2X listeners
-		// This should be called when switching scenes, 
+
+    private void reset() {
+        List<Room> roomList = sfs.RoomManager.GetJoinedRooms();
+        roomList.ForEach(room => sfs.Send(new LeaveRoomRequest(room)));
+
+        // Remove SFS2X listeners
+        // This should be called when switching scenes, 
         // so events from the server do not trigger code in this scene
-		sfs.RemoveAllEventListeners();		
+        sfs.RemoveAllEventListeners();		
 	}
 
 	private void OnConnection(BaseEvent evt) {
