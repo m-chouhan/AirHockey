@@ -1,9 +1,9 @@
 package com.airhockey.handlers;
 
-import com.airhockey.AirHockeyExtension;
+import com.airhockey.AirHockeyRoomExtension;
+import com.smartfoxserver.v2.entities.Room;
 import com.smartfoxserver.v2.entities.User;
 import com.smartfoxserver.v2.entities.data.ISFSObject;
-import com.smartfoxserver.v2.entities.data.SFSObject;
 import com.smartfoxserver.v2.extensions.BaseClientRequestHandler;
 
 public class ReadyHandler extends BaseClientRequestHandler {
@@ -11,9 +11,13 @@ public class ReadyHandler extends BaseClientRequestHandler {
     @Override
     public void handleClientRequest(User user, ISFSObject params) {
 
-        trace("Player : " + user.getId() + " in Ready Handler");
-        AirHockeyExtension airHockeyExtension = (AirHockeyExtension) getParentExtension();
-        if(airHockeyExtension.getParentRoom().getUserList().size() == 2)
-            airHockeyExtension.startGame();
+        AirHockeyRoomExtension airHockeyRoomExtension = (AirHockeyRoomExtension) getParentExtension();
+        Room parentRoom = airHockeyRoomExtension.getParentRoom();
+        Room lastJoinedRoom = user.getLastJoinedRoom();
+        trace("[ReadyHandler] Player : " + user.getId()
+                + " parentRoomName : " + parentRoom.getName() +","+ parentRoom.getSize()
+                + " lastJoinedroom : " + lastJoinedRoom.getName() + "," + lastJoinedRoom.getSize());
+        if(airHockeyRoomExtension.getParentRoom().getUserList().size() == 2)
+            airHockeyRoomExtension.startGame();
     }
 }

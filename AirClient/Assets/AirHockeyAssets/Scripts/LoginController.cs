@@ -8,6 +8,8 @@ using System;
 using Sfs2X.Requests;
 using Sfs2X.Entities.Data;
 using TMPro;
+using System.Collections.Generic;
+using Sfs2X.Entities;
 
 public class LoginController : MonoBehaviour {
 
@@ -25,11 +27,13 @@ public class LoginController : MonoBehaviour {
 
     public TMP_InputField inputField;
     public TMP_Text errorText;
+    public GameObject loginView;
 
-	private SmartFox sfs;
+    private SmartFox sfs;
 
 	void Awake() {
 		Application.runInBackground = true;
+        inputField.text = PlayerPrefs.GetString("name");
 	}
 	
 	void Update() {
@@ -37,7 +41,12 @@ public class LoginController : MonoBehaviour {
 			sfs.ProcessEvents();
 	}
 
-	public void OnLoginButtonClick() {		
+    public void ToggleLoginView()
+    {
+        loginView.SetActive(!loginView.activeSelf);
+    }
+
+    public void OnLoginButtonClick() {		
 		ConfigData cfg = new ConfigData();
 		cfg.Host = Host;
 		cfg.Port = TcpPort;
@@ -51,12 +60,15 @@ public class LoginController : MonoBehaviour {
 		// Connect to SFS2X
 		sfs.Connect(cfg);
 	}
-    	
-	private void reset() {
-		// Remove SFS2X listeners
-		// This should be called when switching scenes, 
+
+    private void reset() {
+        List<Room> roomList = sfs.RoomManager.GetJoinedRooms();
+        roomList.ForEach(room => sfs.Send(new LeaveRoomRequest(room)));
+
+        // Remove SFS2X listeners
+        // This should be called when switching scenes, 
         // so events from the server do not trigger code in this scene
-		sfs.RemoveAllEventListeners();		
+        sfs.RemoveAllEventListeners();		
 	}
 
 	private void OnConnection(BaseEvent evt) {
@@ -66,6 +78,7 @@ public class LoginController : MonoBehaviour {
 			Debug.Log("Connection mode is: " + sfs.ConnectionMode);
 			SmartFoxConnection.Connection = sfs;
             Debug.Log("Trying to login as " + inputField.text);
+            PlayerPrefs.SetString("name", inputField.text);
 			sfs.Send(new LoginRequest(inputField.text));
 		}
 		else

@@ -9,7 +9,7 @@ public class Puck : MonoBehaviour
         SFSObject posObj = (SFSObject)sFSObject.GetSFSObject("puck");
         if (posObj == null)
         {
-            Debug.Log("sfs null in " + name);
+            //Debug.Log("puck obj null in " + name);
             return;
         }
 

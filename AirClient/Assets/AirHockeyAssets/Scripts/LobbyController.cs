@@ -16,7 +16,7 @@ public class LobbyController : MonoBehaviour {
 	public GameObject listItem;
 
 	private const string EXTENSION_ID = "AirHockey";
-	private const string EXTENSION_CLASS = "com.airhockey.AirHockeyExtension";
+	private const string EXTENSION_CLASS = "com.airhockey.AirHockeyRoomExtension";
 
     private SmartFox sfs;
 	private bool shuttingDown;
@@ -30,6 +30,8 @@ public class LobbyController : MonoBehaviour {
 			SceneManager.LoadScene("Login");
 			return;
 		}
+
+        Debug.Log("Coming in lobby as " + sfs.MySelf.Name);
 
 		loggedInText.text = "Logged in as " + sfs.MySelf.Name;
 		
@@ -65,11 +67,10 @@ public class LobbyController : MonoBehaviour {
 	}
 	
 	public void OnGameItemClick(int roomId) {
-		// Join the Room
-		sfs.Send(new Sfs2X.Requests.JoinRoomRequest(roomId));
+		sfs.Send(new JoinRoomRequest(roomId));
 	}
-
-	public void OnStartNewGameButtonClick() {
+    	
+    public void OnStartNewGameButtonClick() {
 		// Configure Game Room
 		RoomSettings settings = new RoomSettings(sfs.MySelf.Name + "'s game");
 		settings.GroupId = "default";
@@ -77,31 +78,34 @@ public class LobbyController : MonoBehaviour {
 		settings.MaxUsers = 2;
 		settings.MaxSpectators = 0;
 		settings.Extension = new RoomExtension(EXTENSION_ID, EXTENSION_CLASS);
-
 		// Request Game Room creation to server
 		sfs.Send(new CreateRoomRequest(settings, true, sfs.LastJoinedRoom));
 	}
 
-	private void reset() {
-		// Remove SFS2X listeners
+    public void OnBackButtonClick()
+    {
+        reset();
+        sfs.Disconnect();
+        SceneManager.LoadScene("Login");
+    }
+
+    private void reset() {
 		sfs.RemoveAllEventListeners();
 	}
     	
 	private void populateGamesList() {
-		// For the gamelist we use a scrollable area containing a separate prefab button for each Game Room
-		// Buttons are clickable to join the games
 		List<Room> rooms = sfs.RoomManager.GetRoomList();
-
+        Debug.Log("Populating game list " + rooms.Count);
 		foreach (Room room in rooms) {
+            Debug.Log(room.Name);
 			// Show only game rooms
 			// Also password protected Rooms are skipped, to make this example simpler
 			// (protection would require an interface element to input the password)
 			if (!room.IsGame || room.IsHidden || room.IsPasswordProtected) {
 				continue;
-			}	
+			}
 
-			int roomId = room.Id;
-
+            int roomId = room.Id;
 			GameObject newListItem = Instantiate(listItem) as GameObject;
 			ListItem roomItem = newListItem.GetComponent<ListItem>();
 			roomItem.label.text = room.Name;
@@ -109,24 +113,16 @@ public class LobbyController : MonoBehaviour {
 			roomItem.button.onClick.AddListener(() => OnGameItemClick(roomId));
 			newListItem.transform.SetParent(listContainer, false);
 		}
-        /*
-        GameObject testListItem = Instantiate(listItem) as GameObject;
-        GameListItem item = testListItem.GetComponent<GameListItem>();
-        item.nameLabel.text = "random";
-        item.roomId = 1234;
-        item.button.onClick.AddListener(() => OnGameItemClick(1234));
-        testListItem.transform.SetParent(listContainer, false);
-        */       
     }
 
     private void clearGamesList() {
 		foreach (Transform child in listContainer.transform) {
-			GameObject.Destroy(child.gameObject);
+            Destroy(child.gameObject);
 		}
 	}
     	
 	private void OnConnectionLost(BaseEvent evt) {
-		// Remove SFS2X listeners
+        Debug.Log("Connection Lost!!");
 		reset();
 		if (shuttingDown == true)
 			return;
@@ -136,47 +132,46 @@ public class LobbyController : MonoBehaviour {
 	
 	private void OnRoomJoin(BaseEvent evt) {
 		Room room = (Room) evt.Params["room"];
-		// If we joined a Game Room, then we either created it (and auto joined) or manually selected a game to join
+        Debug.Log("on room join " + room.Name);
+		// If we joined a Game Room, then 
+        // 1. we either created it (and auto joined) or 
+        // 2. manually selected a game to join
 		if (room.IsGame) {
 			reset ();
-			SceneManager.LoadScene("AirHockey");
-		} 
+            Room lobbyRoom = sfs.RoomManager.GetRoomByName("The Lobby");
+            sfs.Send(new LeaveRoomRequest(lobbyRoom));
+            SceneManager.LoadScene("AirHockey");
+		}
 	}
 	
 	private void OnRoomJoinError(BaseEvent evt) {
-		// Show error message
 		Debug.Log("Room join failed: " + (string) evt.Params["errorMessage"]);
 	}
 		
 	private void OnUserEnterRoom(BaseEvent evt) {
 		User user = (User) evt.Params["user"];
-
-		// Show system message
 		Debug.Log("User " + user.Name + " entered the room");
 	}
 	
 	private void OnUserExitRoom(BaseEvent evt) {
 		User user = (User) evt.Params["user"];
-
-		if (user != sfs.MySelf) {
-			// Show system message
-			Debug.Log("User " + user.Name + " left the room");
-		}
+		Debug.Log("User " + user.Name + " left the room");
 	}
 
 	private void OnRoomAdded(BaseEvent evt) {
 		Room room = (Room) evt.Params["room"];
-
-		// Update view (only if room is game)
-		if (room.IsGame) {
+        Debug.Log("on room added " + room.Name);
+        if (room.IsGame) {
 			clearGamesList();
 			populateGamesList();
 		}
 	}
 	
 	public void OnRoomRemoved(BaseEvent evt) {
-		// Update view
-		clearGamesList();
+        Room room = (Room)evt.Params["room"];
+        Debug.Log("room removed " + room.Name);
+        // Update view
+        clearGamesList();
 		populateGamesList();
 	}
 }

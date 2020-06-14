@@ -15,7 +15,7 @@ public class Player : MonoBehaviour, IClickable
         SFSObject posObj = (SFSObject) sfsObj.GetSFSObject(id.ToString());
         if(posObj == null)
         {
-            Debug.Log("sfs null in " + name + ", id " + id);
+            //Debug.Log("sfs null in " + name + ", id " + id);
             return;
         }
 
@@ -71,23 +71,23 @@ public class Player : MonoBehaviour, IClickable
     {
         Vector2 position = ((PointerEventData)data).position;
         Vector2 inGamePos = Camera.main.ScreenToWorldPoint(position);
-        Debug.Log("name" + name + ", pid = " + id + ", " + capture(inGamePos));
+        //Debug.Log("name" + name + ", pid = " + id + ", " + capture(inGamePos));
         if (capture(inGamePos))
         {
             transform.position = Vector3.Lerp(transform.position, inGamePos, 0.2f);
             AirHockeyController.Instance.UpdatePlayerPosition(this);
         }
     }
-
-    // if capture the point only if it lies towards players touchable area
+        
+    // capture the point only if it lies towards players touchable area
     // i.e either -ve x axis or +ve x axis
     public bool capture(Vector2 touchPoint)
     {
         return touchEnabled &&
-            ((touchPoint.x < 0 && transform.position.x < 0) || (touchPoint.x >= 0 && transform.position.x >= 0));
+            ((touchPoint.y < 0 && transform.position.y < 0) || (touchPoint.y >= 0 && transform.position.y >= 0));
     }
 
-    internal void SetTextComponent(TMPro.TextMeshProUGUI textMeshProUGUI)
+    internal void SetTextComponent(TextMeshProUGUI textMeshProUGUI)
     {
         text = textMeshProUGUI;
     }
