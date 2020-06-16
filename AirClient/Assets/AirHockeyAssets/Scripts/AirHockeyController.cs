@@ -32,9 +32,8 @@ public class AirHockeyController : MonoBehaviour
             Destroy(gameObject);
 
         Application.runInBackground = true;
-        if (SmartFoxConnection.IsInitialized)
+        if (NetWrapper.IsInitialized)
         {
-            sfs = SmartFoxConnection.Connection;
             InitGame();
         }
         else
@@ -42,7 +41,7 @@ public class AirHockeyController : MonoBehaviour
             //no point starting the game, need to relogin
             Debug.Log("sfs is null!!");
             SceneManager.LoadScene("Login");
-            return;
+            return; 
         }
     }
 

@@ -15,17 +15,13 @@ public class LobbyController : MonoBehaviour {
 	public Transform listContainer;
 	public GameObject listItem;
 
-	private const string EXTENSION_ID = "AirHockey";
-	private const string EXTENSION_CLASS = "com.airhockey.AirHockeyRoomExtension";
-
     private SmartFox sfs;
 	private bool shuttingDown;
 
 	void Awake() {
 		Application.runInBackground = true;
 		
-		if (SmartFoxConnection.IsInitialized) {
-			sfs = SmartFoxConnection.Connection;
+		if (NetWrapper.IsInitialized) {
 		} else {
 			SceneManager.LoadScene("Login");
 			return;
@@ -71,16 +67,8 @@ public class LobbyController : MonoBehaviour {
 	}
     	
     public void OnStartNewGameButtonClick() {
-		// Configure Game Room
-		RoomSettings settings = new RoomSettings(sfs.MySelf.Name + "'s game");
-		settings.GroupId = "default";
-		settings.IsGame = true;
-		settings.MaxUsers = 2;
-		settings.MaxSpectators = 0;
-		settings.Extension = new RoomExtension(EXTENSION_ID, EXTENSION_CLASS);
-		// Request Game Room creation to server
-		sfs.Send(new CreateRoomRequest(settings, true, sfs.LastJoinedRoom));
-	}
+        NetWrapper.Instance.CreateRoom(sfs.MySelf.Name + "'s game");
+    }
 
     public void OnBackButtonClick()
     {
