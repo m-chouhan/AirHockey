@@ -1,22 +1,13 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.SceneManagement;
-using Sfs2X;
-using Sfs2X.Util;
-using Sfs2X.Core;
-using System;
-using Sfs2X.Requests;
-using Sfs2X.Entities.Data;
 using TMPro;
-using System.Collections.Generic;
-using Sfs2X.Entities;
-using System.Threading.Tasks;
 using UniRx;
+using Sfs2X.Requests;
 
 public class LoginController : MonoBehaviour {
 
     public TMP_InputField inputField;
-    public TMP_Text errorText;
+    public TMP_Text error;
     public GameObject loginView;
 
     void Awake() {
@@ -32,16 +23,25 @@ public class LoginController : MonoBehaviour {
     public void OnLoginButtonClick() {
         if (string.IsNullOrEmpty(inputField.text))
         {
-            errorText.text = "username is empty!!";
+            error.text = "username is empty!!";
             return;
         }
 
         NetWrapper.Instance.Login(inputField.text).Subscribe(
             (ev) => Debug.Log(ev), 
-            (ev) => errorText.text = ev.Message,
+            (ev) => error.text = ev.Message,
             () => {
                 PlayerPrefs.SetString("name", inputField.text);
-                SceneManager.LoadScene("Lobby");
+                NetWrapper.Instance
+                    .JoinRoom(new JoinRoomRequest("The Lobby"))
+                    .Subscribe(
+                        (item) => {},
+                        err => {
+                            Debug.Log(err.Message);
+                            error.text = err.Message;
+                        },
+                        () => Scenes.Load("Lobby", "username", inputField.text)
+                    );
             }
         );
     }

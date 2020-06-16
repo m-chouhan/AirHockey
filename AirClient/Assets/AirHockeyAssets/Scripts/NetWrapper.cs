@@ -5,6 +5,8 @@ using Sfs2X.Util;
 using Sfs2X.Core;
 using Sfs2X.Requests;
 using UniRx;
+using System.Collections.Generic;
+using Sfs2X.Entities;
 
 public class NetWrapper : MonoBehaviour
 {
@@ -19,19 +21,6 @@ public class NetWrapper : MonoBehaviour
     public static bool IsInitialized = false;
     public static NetWrapper Instance;
 
-    //   public static SmartFox Connection {
-    //	get {
-    //		if (mInstance == null) {
-    //               GameObject go = new GameObject("SmartFoxConnection");
-    //               go.tag = "NetWrapper";
-    //			mInstance = go.AddComponent(typeof(NetWrapper)) as NetWrapper;
-    //               sfs = new SmartFox();
-    //               DontDestroyOnLoad(go);
-    //           }
-    //           return sfs;
-    //	}
-    //}
-
     void Awake()
     {
         if(Instance == null)
@@ -42,6 +31,20 @@ public class NetWrapper : MonoBehaviour
         } else if(Instance != this)
         {
             Destroy(gameObject);
+        }
+    }
+
+    void Update()
+    {
+        if (sfs != null)
+            sfs.ProcessEvents();
+    }
+
+    void OnApplicationQuit()
+    {
+        if (sfs != null && sfs.IsConnected)
+        {
+            sfs.Disconnect();
         }
     }
 
@@ -88,22 +91,26 @@ public class NetWrapper : MonoBehaviour
         });
         // Connect to SFS2X
         sfs.Connect(cfg);
+        loginStream.Finally(() => {
+            sfs.RemoveAllEventListeners();
+            Debug.Log("Finally (login) clean up");
+        });
+
         return loginStream.AsObservable();
     }
 
-    void Update()
-    {
-        if (sfs != null)
-            sfs.ProcessEvents();
+    public IObservable<string> LogOut() {
+        Subject<string> subject = new Subject<string>();
+        sfs.AddEventListener(SFSEvent.LOGOUT, ev => subject.OnCompleted());
+        sfs.Send(new LogoutRequest());
+        subject.Finally(() => {
+            sfs.RemoveAllEventListeners();
+            Debug.Log("Finally (logout) cleanup");
+        });
+        return subject.AsObservable();
     }
-    	
-	void OnApplicationQuit() { 
-		if (sfs.IsConnected) {
-			sfs.Disconnect();
-		}
-	}
 
-    public void CreateRoom(string roomName)
+    public IObservable<string> CreateRoom(string roomName)
     {
         // Configure Game Room
         RoomSettings settings = new RoomSettings(roomName);
@@ -114,5 +121,47 @@ public class NetWrapper : MonoBehaviour
         settings.Extension = new RoomExtension(EXTENSION_ID, EXTENSION_CLASS);
         // Request Game Room creation to server
         sfs.Send(new CreateRoomRequest(settings, true, sfs.LastJoinedRoom));
+        return Observable.Empty<string>();
+    }
+
+    public IObservable<string> JoinRoom(JoinRoomRequest request)
+    {
+        Subject<string> subject = new Subject<string>();
+        sfs.AddEventListener(SFSEvent.ROOM_JOIN, ev => subject.OnCompleted());
+        sfs.AddEventListener(SFSEvent.ROOM_JOIN_ERROR,
+            ev =>
+                subject.OnError(new Exception((string)ev.Params["errorMessage"])));
+
+        sfs.Send(request);
+        subject.Finally(() => {
+            sfs.RemoveAllEventListeners();
+            Debug.Log("Finally (join room) cleanup");
+        });
+        return subject.AsObservable();
+    }
+
+    public List<Room> FetchRoomList()
+    {
+        return sfs.RoomList;
+    }
+
+    public IObservable<BaseEvent> FetchRoomEvents()
+    {
+        Subject<BaseEvent> subject = 
+            new Subject<BaseEvent>();
+
+        sfs.AddEventListener(SFSEvent.ROOM_ADD, 
+            ev => subject.OnNext(ev));
+        sfs.AddEventListener(SFSEvent.ROOM_REMOVE,
+            ev => subject.OnNext(ev));
+        //sfs.AddEventListener(SFSEvent.USER_ENTER_ROOM, ev => subject.OnNext(ev));
+        //sfs.AddEventListener(SFSEvent.USER_EXIT_ROOM, ev => subject.OnNext(ev));
+        //sfs.AddEventListener(SFSEvent.CONNECTION_LOST, ev => { });
+
+        subject.Finally(() => {
+            sfs.RemoveAllEventListeners();
+            Debug.Log("Finally (join room) cleanup");
+        });
+        return subject.AsObservable();
     }
 }
