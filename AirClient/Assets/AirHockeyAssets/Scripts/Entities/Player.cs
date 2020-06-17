@@ -8,7 +8,7 @@ public class Player : MonoBehaviour, IClickable
 {
     public int id = 0;
     public int score = 0;
-    TextMeshProUGUI text;
+    public TextMeshProUGUI text;
     public bool touchEnabled = false;
 
     public void SetPosition(ISFSObject sfsObj) {

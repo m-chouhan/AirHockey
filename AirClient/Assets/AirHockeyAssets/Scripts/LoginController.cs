@@ -41,8 +41,8 @@ public class LoginController : MonoBehaviour {
                             error.text = err.Message;
                         },
                         () => Scenes.Load("Lobby", "username", inputField.text)
-                    );
+                    ).AddTo(this);
             }
-        );
+        ).AddTo(this);
     }
 }

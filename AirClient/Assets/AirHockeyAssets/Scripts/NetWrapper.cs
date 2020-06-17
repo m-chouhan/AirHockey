@@ -7,6 +7,7 @@ using Sfs2X.Requests;
 using UniRx;
 using System.Collections.Generic;
 using Sfs2X.Entities;
+using Sfs2X.Entities.Data;
 
 public class NetWrapper : MonoBehaviour
 {
@@ -17,14 +18,21 @@ public class NetWrapper : MonoBehaviour
     private int TcpPort = 9933;
     private int UdpPort = 9934;
     private string Zone = "AirHockey";
-    private string EXTENSION_ID = "AirHockey";
-    private string EXTENSION_CLASS = "com.airhockey.AirHockeyRoomExtension";
+    private readonly string EXTENSION_ID = "AirHockey";
+    private readonly string EXTENSION_CLASS = "com.airhockey.AirHockeyRoomExtension";
 	private SmartFox sfs;
 
     public Room LastJoinedRoom
     {
         get {
             return sfs?.LastJoinedRoom;
+        }
+    }
+
+    private Subject<SFSObject> inGameStream;
+    public IObservable<SFSObject> InGameStream { 
+        get {
+            return inGameStream.AsObservable();
         }
     }
 
@@ -121,12 +129,14 @@ public class NetWrapper : MonoBehaviour
     {
         Subject<Room> subject = new Subject<Room>();
         // Configure Game Room
-        RoomSettings settings = new RoomSettings(roomName);
-        settings.GroupId = "default";
-        settings.IsGame = true;
-        settings.MaxUsers = 2;
-        settings.MaxSpectators = 0;
-        settings.Extension = new RoomExtension(EXTENSION_ID, EXTENSION_CLASS);
+        RoomSettings settings = new RoomSettings(roomName)
+        {
+            GroupId = "default",
+            IsGame = true,
+            MaxUsers = 2,
+            MaxSpectators = 0,
+            Extension = new RoomExtension(EXTENSION_ID, EXTENSION_CLASS)
+        };
 
         sfs.AddEventListener(SFSEvent.ROOM_JOIN, 
             ev => {
@@ -137,7 +147,7 @@ public class NetWrapper : MonoBehaviour
 
         sfs.AddEventListener(SFSEvent.ROOM_JOIN_ERROR, 
             ev => subject.OnError(new Exception((string)ev.Params["errorMessage"])));
-        // Request Game Room creation to server
+        // create room request and leave previous room post join
         sfs.Send(new CreateRoomRequest(settings, true, sfs.LastJoinedRoom));
         subject.Finally(() => {
             sfs.RemoveAllEventListeners();

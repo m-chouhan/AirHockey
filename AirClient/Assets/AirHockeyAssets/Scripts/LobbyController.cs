@@ -25,7 +25,8 @@ public class LobbyController : MonoBehaviour {
         PopulateGamesList(NetWrapper.Instance.FetchRoomList());
         NetWrapper.Instance
             .FetchRoomEvents()
-            .Subscribe(RoomEventHandler);
+            .Subscribe(RoomEventHandler)
+            .AddTo(this);
     }
 
     public void OnLogoutButtonClick() {
@@ -40,8 +41,8 @@ public class LobbyController : MonoBehaviour {
             .Subscribe(
                     item => {}, 
                     error => Debug.Log(error.Message), 
-                    () => Scenes.Load("Game", "Mode", "Multiplayer")
-            );
+                    () => Scenes.Load("Game_v2", "Mode", "Multiplayer")
+            ).AddTo(this);
     }
 
     public void OnStartNewGameButtonClick() {
@@ -50,9 +51,9 @@ public class LobbyController : MonoBehaviour {
                     item => { },
                     error => Debug.Log(error.Message),
                     () => {
-                        Scenes.Load("Game", "Mode", "Multiplayer");
+                        Scenes.Load("Game_v2", "Mode", "Multiplayer");
                     }
-                );
+                ).AddTo(this);
     }
 
     public void OnBackButtonClick()
