@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 using TMPro;
 using System.Collections.Generic;
 
-public class AirHockeyController : MonoBehaviour
+public class GameController : MonoBehaviour
 {
     public GameObject playerAPrefab;
     public GameObject playerBPrefab;
@@ -23,7 +23,7 @@ public class AirHockeyController : MonoBehaviour
     private Player current, other;
     private Puck puck;
 
-    public static AirHockeyController Instance;
+    public static GameController Instance;
     void Awake()
     {
         if (Instance == null)
@@ -32,17 +32,7 @@ public class AirHockeyController : MonoBehaviour
             Destroy(gameObject);
 
         Application.runInBackground = true;
-        if (NetWrapper.IsInitialized)
-        {
-            InitGame();
-        }
-        else
-        {
-            //no point starting the game, need to relogin
-            Debug.Log("sfs is null!!");
-            SceneManager.LoadScene("Login");
-            return; 
-        }
+        InitGame();
     }
 
     // Update is called once per frame

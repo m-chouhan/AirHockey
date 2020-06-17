@@ -75,7 +75,7 @@ public class Player : MonoBehaviour, IClickable
         if (capture(inGamePos))
         {
             transform.position = Vector3.Lerp(transform.position, inGamePos, 0.2f);
-            AirHockeyController.Instance.UpdatePlayerPosition(this);
+            GameController.Instance.UpdatePlayerPosition(this);
         }
     }
         

@@ -10,16 +10,23 @@ using Sfs2X.Entities;
 
 public class NetWrapper : MonoBehaviour
 {
+    public static bool IsInitialized = false;
+    public static NetWrapper Instance;
+
     private string Host = "52.66.195.155";
     private int TcpPort = 9933;
     private int UdpPort = 9934;
     private string Zone = "AirHockey";
     private string EXTENSION_ID = "AirHockey";
     private string EXTENSION_CLASS = "com.airhockey.AirHockeyRoomExtension";
-
 	private SmartFox sfs;
-    public static bool IsInitialized = false;
-    public static NetWrapper Instance;
+
+    public Room LastJoinedRoom
+    {
+        get {
+            return sfs?.LastJoinedRoom;
+        }
+    }
 
     void Awake()
     {
@@ -110,8 +117,9 @@ public class NetWrapper : MonoBehaviour
         return subject.AsObservable();
     }
 
-    public IObservable<string> CreateRoom(string roomName)
+    public IObservable<Room> CreateRoom(string roomName)
     {
+        Subject<Room> subject = new Subject<Room>();
         // Configure Game Room
         RoomSettings settings = new RoomSettings(roomName);
         settings.GroupId = "default";
@@ -119,15 +127,34 @@ public class NetWrapper : MonoBehaviour
         settings.MaxUsers = 2;
         settings.MaxSpectators = 0;
         settings.Extension = new RoomExtension(EXTENSION_ID, EXTENSION_CLASS);
+
+        sfs.AddEventListener(SFSEvent.ROOM_JOIN, 
+            ev => {
+                subject.OnNext((Room)ev.Params["room"]);
+                subject.OnCompleted();
+            }
+        );
+
+        sfs.AddEventListener(SFSEvent.ROOM_JOIN_ERROR, 
+            ev => subject.OnError(new Exception((string)ev.Params["errorMessage"])));
         // Request Game Room creation to server
         sfs.Send(new CreateRoomRequest(settings, true, sfs.LastJoinedRoom));
-        return Observable.Empty<string>();
+        subject.Finally(() => {
+            sfs.RemoveAllEventListeners();
+            Debug.Log("Finally (create room) cleanup");
+        });
+        return subject.AsObservable();
     }
 
-    public IObservable<string> JoinRoom(JoinRoomRequest request)
+    public IObservable<Room> JoinRoom(JoinRoomRequest request)
     {
-        Subject<string> subject = new Subject<string>();
-        sfs.AddEventListener(SFSEvent.ROOM_JOIN, ev => subject.OnCompleted());
+        Subject<Room> subject = new Subject<Room>();
+        sfs.AddEventListener(SFSEvent.ROOM_JOIN,
+            ev => {
+                subject.OnNext((Room)ev.Params["room"]);
+                subject.OnCompleted();
+            }
+        );
         sfs.AddEventListener(SFSEvent.ROOM_JOIN_ERROR,
             ev =>
                 subject.OnError(new Exception((string)ev.Params["errorMessage"])));

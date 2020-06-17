@@ -35,12 +35,13 @@ public class LobbyController : MonoBehaviour {
     }
 	
     public void OnGameItemClick(int roomId) {
-        NetWrapper.Instance.JoinRoom(new JoinRoomRequest(roomId))
-                .Subscribe(
+        NetWrapper.Instance
+            .JoinRoom(new JoinRoomRequest(roomId, "", NetWrapper.Instance.LastJoinedRoom.Id))
+            .Subscribe(
                     item => {}, 
                     error => Debug.Log(error.Message), 
                     () => Scenes.Load("Game", "Mode", "Multiplayer")
-                );
+            );
     }
 
     public void OnStartNewGameButtonClick() {
@@ -48,7 +49,9 @@ public class LobbyController : MonoBehaviour {
                 .Subscribe(
                     item => { },
                     error => Debug.Log(error.Message),
-                    () => Scenes.Load("Game", "Mode", "Multiplayer")
+                    () => {
+                        Scenes.Load("Game", "Mode", "Multiplayer");
+                    }
                 );
     }
 
