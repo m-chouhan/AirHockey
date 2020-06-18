@@ -22,6 +22,11 @@ public class Player : MonoBehaviour, IClickable
         transform.position = new Vector2(posObj.GetFloat("x"), posObj.GetFloat("y"));
     }
 
+    public void SetPosition(float x, float y)
+    {
+        transform.position = new Vector2(x, y);
+    }
+
     public void SetScore(ISFSObject sfsObj) {
         if (!sfsObj.ContainsKey(id.ToString()))
             return;
@@ -46,37 +51,37 @@ public class Player : MonoBehaviour, IClickable
 
     void Awake()
     {
-        /**
-         * TODO Check performance of event triggers for touch input.
-         * might have to move this to Input.getTouch if things are not fine.
-         * */       
-        EventTrigger trigger = GetComponent<EventTrigger>();
-        EventTrigger.Entry entry = new EventTrigger.Entry
-        { eventID = EventTriggerType.Drag };
-        entry.callback.AddListener(OnDragEventListener);
-        trigger.triggers.Add(entry);
+        ///**
+        // * TODO Check performance of event triggers for touch input.
+        // * might have to move this to Input.getTouch if things are not fine.
+        // * */       
+        //EventTrigger trigger = GetComponent<EventTrigger>();
+        //EventTrigger.Entry entry = new EventTrigger.Entry
+        //{ eventID = EventTriggerType.Drag };
+        //entry.callback.AddListener(OnDragEventListener);
+        //trigger.triggers.Add(entry);
 
-        EventTrigger.Entry endDrag = new EventTrigger.Entry
-        { eventID = EventTriggerType.EndDrag };
-        endDrag.callback.AddListener(OnDragEventListener);
-        trigger.triggers.Add(endDrag);
+        //EventTrigger.Entry endDrag = new EventTrigger.Entry
+        //{ eventID = EventTriggerType.EndDrag };
+        //endDrag.callback.AddListener(OnDragEventListener);
+        //trigger.triggers.Add(endDrag);
 
-        EventTrigger.Entry pointerDown = new EventTrigger.Entry
-        { eventID = EventTriggerType.PointerDown };
-        pointerDown.callback.AddListener(OnDragEventListener);
-        trigger.triggers.Add(pointerDown);
+        //EventTrigger.Entry pointerDown = new EventTrigger.Entry
+        //{ eventID = EventTriggerType.PointerDown };
+        //pointerDown.callback.AddListener(OnDragEventListener);
+        //trigger.triggers.Add(pointerDown);
     }
 
     private void OnDragEventListener(BaseEventData data)
     {
-        Vector2 position = ((PointerEventData)data).position;
-        Vector2 inGamePos = Camera.main.ScreenToWorldPoint(position);
+        //Vector2 position = ((PointerEventData)data).position;
+        //Vector2 inGamePos = Camera.main.ScreenToWorldPoint(position);
         //Debug.Log("name" + name + ", pid = " + id + ", " + capture(inGamePos));
-        if (capture(inGamePos))
-        {
-            transform.position = Vector3.Lerp(transform.position, inGamePos, 0.2f);
-            GameController.Instance.UpdatePlayerPosition(this);
-        }
+        //if (capture(inGamePos))
+        //{
+        //    transform.position = Vector3.Lerp(transform.position, inGamePos, 0.2f);
+        //    GameController.Instance.UpdatePlayerPosition(this);
+        //}
     }
         
     // capture the point only if it lies towards players touchable area
@@ -87,12 +92,11 @@ public class Player : MonoBehaviour, IClickable
             ((touchPoint.y < 0 && transform.position.y < 0) || (touchPoint.y >= 0 && transform.position.y >= 0));
     }
 
-    internal void SetTextComponent(TextMeshProUGUI textMeshProUGUI)
-    {
-        text = textMeshProUGUI;
+    public void SetId(int id) { this.id = id; }
+
+    public void EnableTouch() { touchEnabled = true; }
+
+    public void SetTextComponent(TextMeshProUGUI text) {
+        this.text = text;
     }
-
-    internal void SetId(int id) { this.id = id; }
-
-    internal void EnableTouch() { touchEnabled = true; }
 }

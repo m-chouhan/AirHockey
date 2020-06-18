@@ -201,4 +201,24 @@ public class NetWrapper : MonoBehaviour
         });
         return subject.AsObservable();
     }
+
+    public IObservable<BaseEvent> FetchGameEvents()
+    {
+        Subject<BaseEvent> subject = new Subject<BaseEvent>();
+        sfs.AddEventListener(SFSEvent.EXTENSION_RESPONSE,
+            resp => 
+            {
+                subject.OnNext(resp);
+                string cmd = (string)resp.Params["cmd"];
+                if (cmd.Equals("end")) subject.OnCompleted();
+            }
+        );
+
+        return subject.AsObservable();
+    }
+
+    public void PushGameEvent(string cmd, SFSObject sFSObject, bool udp = true)
+    {
+        sfs.Send(new ExtensionRequest(cmd, sFSObject, sfs.LastJoinedRoom, udp));
+    }
 }

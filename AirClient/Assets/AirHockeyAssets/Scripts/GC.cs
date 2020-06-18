@@ -1,4 +1,5 @@
-﻿using UniRx;
+﻿using Sfs2X.Entities.Data;
+using UniRx;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -26,14 +27,49 @@ public class GC : MonoBehaviour
 
         switch(Scenes.getParam("Mode"))
         {
-            case "Multiplayer":
+            case "Multiplayer-Online":
+                current.touchEnabled = true;
+                TouchAdapter
+                    .FetchTouchEvents(current.gameObject)
+                    .Do(item => Debug.Log(item))
+                    .Where(ev => current.capture(ev))
+                    .Subscribe(ev => {
+                        current.SetPosition(ev.x, ev.y);
+                        NetWrapper.Instance.PushGameEvent("move", current.ToSFS());
+                    })
+                    .AddTo(this);
+                NetWrapper.Instance
+                    .FetchGameEvents()
+                    .Where(ev => ((string)ev.Params["cmd"]).Equals("move"))
+                    .Subscribe(ev => {
+                        SFSObject data = (SFSObject)ev.Params["params"];
+                        var pos = data.GetSFSObject(other.id.ToString());
+                        other.SetPosition(pos.GetFloat("x"), pos.GetFloat("y"));
+                    })
+                    .AddTo(this);
+
                 //NetWrapper.Instance.InGameStream.Subscribe();
                 break;
-            case "SinglePlayer":
-                break;
             default:
-                //current.InputAdapter = new TouchInputAdapter();
-                //other.InputAdapter = new TouchInputAdapter();
+            case "Multiplayer-Local":
+                current.touchEnabled = true;
+                other.touchEnabled = true;
+                TouchAdapter
+                    .FetchTouchEvents(current.gameObject)
+                    .Where(ev => current.capture(ev))
+                    .Subscribe(ev => {
+                        current.SetPosition(ev.x, ev.y);
+                    })
+                    .AddTo(this);
+                TouchAdapter
+                    .FetchTouchEvents(other.gameObject)
+                    .Where(ev => other.capture(ev))
+                    .Subscribe(ev => {
+                        other.SetPosition(ev.x, ev.y);
+                    })
+                    .AddTo(this);
+                break;
+            case "Singleplayer":
                 break;
         }
     }

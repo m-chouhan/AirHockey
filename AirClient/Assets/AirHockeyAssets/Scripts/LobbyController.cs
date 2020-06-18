@@ -40,8 +40,8 @@ public class LobbyController : MonoBehaviour {
             .JoinRoom(new JoinRoomRequest(roomId, "", NetWrapper.Instance.LastJoinedRoom.Id))
             .Subscribe(
                     item => {}, 
-                    error => Debug.Log(error.Message), 
-                    () => Scenes.Load("Game_v2", "Mode", "Multiplayer")
+                    error => Debug.Log(error.Message),
+                    () => Scenes.Load("Game_v2", "Mode", "Multiplayer-Online")
             ).AddTo(this);
     }
 
