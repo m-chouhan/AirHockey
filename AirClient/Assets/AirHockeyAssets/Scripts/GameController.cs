@@ -101,7 +101,7 @@ public class GameController : MonoBehaviour
                 other = player2.GetComponent<Player>();
                 puck = puckGO.GetComponent<Puck>();
 
-                current.SetId(sfs.MySelf.Id);
+                current.id = sfs.MySelf.Id;
                 current.SetPosition(dataObject);
 
                 //TODO : can be done in a better way---
@@ -110,7 +110,7 @@ public class GameController : MonoBehaviour
                     Debug.Log("uid recv :" + uid);
                     if (uid != sfs.MySelf.Id)
                     {
-                        other.SetId(uid);
+                        other.id = uid;
                         other.SetPosition(dataObject);
                     }
                 }
@@ -122,7 +122,7 @@ public class GameController : MonoBehaviour
                 }
                 current.SetTextComponent(scoreBottom);
                 other.SetTextComponent(scoreTop);
-                current.EnableTouch();
+                current.touch = true;
                 current.gameObject.name = "me";
                 other.gameObject.name = "other";
                 puck.gameObject.name = "puck";
@@ -134,8 +134,8 @@ public class GameController : MonoBehaviour
                 break;
             case "updateScore":
                 Debug.Log("ext response : " + cmd);
-                current.SetScore(dataObject);
-                other.SetScore(dataObject);
+                current.SetScore(10);
+                other.SetScore(20);
                 break;
             case "reset":
                 current.SetPosition(dataObject);

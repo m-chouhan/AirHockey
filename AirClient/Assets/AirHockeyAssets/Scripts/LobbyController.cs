@@ -51,7 +51,7 @@ public class LobbyController : MonoBehaviour {
                     item => { },
                     error => Debug.Log(error.Message),
                     () => {
-                        Scenes.Load("Game_v2", "Mode", "Multiplayer");
+                        Scenes.Load("Game_v2", "Mode", "Multiplayer-Online");
                     }
                 ).AddTo(this);
     }

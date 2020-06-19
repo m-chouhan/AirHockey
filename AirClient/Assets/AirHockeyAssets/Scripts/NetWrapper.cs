@@ -29,12 +29,7 @@ public class NetWrapper : MonoBehaviour
         }
     }
 
-    private Subject<SFSObject> inGameStream;
-    public IObservable<SFSObject> InGameStream { 
-        get {
-            return inGameStream.AsObservable();
-        }
-    }
+    public int Id { get { return sfs.MySelf.Id; } }
 
     void Awake()
     {
@@ -208,8 +203,26 @@ public class NetWrapper : MonoBehaviour
         sfs.AddEventListener(SFSEvent.EXTENSION_RESPONSE,
             resp => 
             {
-                subject.OnNext(resp);
                 string cmd = (string)resp.Params["cmd"];
+                switch(cmd)
+                {
+                    case "start":
+                        SFSObject data = (SFSObject) resp.Params["params"];
+                        string curId = sfs.MySelf.Id.ToString();
+                        string [] keys = data.GetKeys();
+                        string otherId = Array.Find(keys, 
+                                key => !key.Equals("puck") && !key.Equals(curId));
+
+                        ISFSObject curData = data.GetSFSObject(curId);
+                        ISFSObject otherData = data.GetSFSObject(otherId);
+                        data.PutSFSObject("current", curData);
+                        data.PutSFSObject("other", otherData);
+                        data.RemoveElement(curId);
+                        data.RemoveElement(otherId);
+                        Debug.Log("[start] updated data is " + data.ToJson());
+                        break;                    
+                }
+                subject.OnNext(resp);
                 if (cmd.Equals("end")) subject.OnCompleted();
             }
         );
@@ -217,7 +230,7 @@ public class NetWrapper : MonoBehaviour
         return subject.AsObservable();
     }
 
-    public void PushGameEvent(string cmd, SFSObject sFSObject, bool udp = true)
+    public void PushGameEvent(string cmd, SFSObject sFSObject, bool udp = false)
     {
         sfs.Send(new ExtensionRequest(cmd, sFSObject, sfs.LastJoinedRoom, udp));
     }
