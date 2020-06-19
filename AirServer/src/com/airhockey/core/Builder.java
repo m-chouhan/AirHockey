@@ -19,8 +19,8 @@ public class Builder {
 
     public static Body createObstacle(float x, float y, float width, float height) {
         Body wall = new Body();
-        wall.addFixture(Geometry.createRectangle(width, height), 1, 0, 1.15f);
-        wall.setAngularDamping(1);
+        wall.addFixture(Geometry.createRectangle(width, height), 1, 0, 1.1f);
+        //wall.setAngularDamping(1);
         wall.setMass(MassType.INFINITE);
         wall.translate(x, y);
         return wall;
@@ -59,7 +59,7 @@ public class Builder {
         Body master = new Body();
         Circle fixture = Geometry.createCircle(0.02);
         master.addFixture(fixture);
-        master.setAngularDamping(1);
+        //master.setAngularDamping(1);
         master.setMass(MassType.INFINITE);
         master.setAutoSleepingEnabled(false);
         world.addBody(master);
@@ -67,7 +67,7 @@ public class Builder {
         Body slave = new Body();
         slave.addFixture(Geometry.createCircle(scale));
         slave.setMass(FIXED_ANGULAR_VELOCITY);
-        slave.setAngularDamping(1);
+        //slave.setAngularDamping(1);
         slave.setAutoSleepingEnabled(false);
         world.addBody(slave);
 
@@ -88,7 +88,7 @@ public class Builder {
         Puck circle = new Puck();
         circle.addFixture(Geometry.createCircle(scale/2));
         circle.setMass(NORMAL);
-        circle.setAngularDamping(1f);
+        //circle.setAngularDamping(1f);
         //circle.getFixture(0).setRestitution(1f);
         circle.setAutoSleepingEnabled(false);
         circle.translate(x,y);

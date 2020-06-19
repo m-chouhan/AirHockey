@@ -25,10 +25,10 @@ public class GameState implements NetworkInterface {
         SFSObject out = new SFSObject();
         out.putSFSObject(String.valueOf(player1.id), player1.toNetworkObj());
         out.putSFSObject(String.valueOf(player2.id), player2.toNetworkObj());
-        SFSObject p = new SFSObject();
-        p.putFloat("x", (float) puck.getTransform().getTranslationX());
-        p.putFloat("y", (float) puck.getTransform().getTranslationY());
-        out.putSFSObject("puck", p);
+        SFSObject puck = new SFSObject();
+        puck.putFloat("x", (float) this.puck.getTransform().getTranslationX());
+        puck.putFloat("y", (float) this.puck.getTransform().getTranslationY());
+        out.putSFSObject("puck", puck);
         return out;
     }
 

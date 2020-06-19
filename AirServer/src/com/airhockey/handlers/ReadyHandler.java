@@ -17,7 +17,8 @@ public class ReadyHandler extends BaseClientRequestHandler {
         trace("[ReadyHandler] Player : " + user.getId()
                 + " parentRoomName : " + parentRoom.getName() +","+ parentRoom.getSize()
                 + " lastJoinedroom : " + lastJoinedRoom.getName() + "," + lastJoinedRoom.getSize());
-        if(airHockeyRoomExtension.getParentRoom().getUserList().size() == 2)
-            airHockeyRoomExtension.startGame();
+        if(lastJoinedRoom.getSize().getUserCount() == 2)
+            airHockeyRoomExtension
+                    .startGame(lastJoinedRoom.getUserList().get(0), lastJoinedRoom.getUserList().get(1));
     }
 }
