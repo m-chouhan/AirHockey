@@ -1,9 +1,10 @@
 ﻿using Sfs2X.Entities.Data;
+using Sfs2X.Requests;
 using UniRx;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class GC : MonoBehaviour
+public class Game_v2 : MonoBehaviour
 {
     public GameObject gameEndPanel;
     public Camera cam;
@@ -50,9 +51,11 @@ public class GC : MonoBehaviour
                         other.SetPosition(ev.x, ev.y);
                     }).AddTo(this);
                 */
-                gameStream.Subscribe(ev => GameEventHandler((string)ev.Params["cmd"],
-                                            (SFSObject)ev.Params["params"]));
-
+                gameStream.Subscribe(ev => GameEventHandler(
+                                            (string)ev.Params["cmd"],
+                                            ev.Params.ContainsKey("params") 
+                                                ? (SFSObject)ev.Params["params"] 
+                                                : null));
                 NetWrapper.Instance.PushGameEvent("ready", new SFSObject(), false);
                 break;
             default:
@@ -84,7 +87,13 @@ public class GC : MonoBehaviour
     public void BackToLobby()
     {
         Debug.Log("back to lobby pressed!");
-        SceneManager.LoadScene("Lobby");
+        NetWrapper.Instance
+            .JoinRoom(new JoinRoomRequest("The Lobby", "", NetWrapper.Instance.LastJoinedRoom.Id))
+            .Subscribe(
+                    item => { },
+                    error => Debug.Log(error.Message),
+                    () => Scenes.Load("Lobby")
+            ).AddTo(this);
     }
 
     private void GameEventHandler(string cmd, SFSObject data)
@@ -119,10 +128,13 @@ public class GC : MonoBehaviour
                 puck.SetPosition(data.GetSFSObject("puck"));
                 break;
             case "end":
-                bool won = data.GetUtfString("won").Equals(curId);
-                Debug.Log("result : " + data.GetUtfString("won") + " has won!");
+                bool won = data.GetInt("won") == current.id;
+                Debug.Log("result : " + (won ? "current" : "other") + " has won!");
                 if (!won) gameEndPanel.transform.rotation = Quaternion.Euler(0, 0, 180);
                 gameEndPanel.SetActive(true);
+                break;
+            case "userExit":
+                BackToLobby();
                 break;
         }
     }

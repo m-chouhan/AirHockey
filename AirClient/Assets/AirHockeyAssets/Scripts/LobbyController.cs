@@ -19,7 +19,7 @@ public class LobbyController : MonoBehaviour {
 
     void Awake() {
         Application.runInBackground = true;
-        username = Scenes.getParam("username");
+        username = PlayerPrefs.GetString("name");
         Debug.Log("Coming in lobby as " + username);
         loggedInText.text = "Logged in as " + username;
         PopulateGamesList(NetWrapper.Instance.FetchRoomList());
@@ -34,7 +34,7 @@ public class LobbyController : MonoBehaviour {
             .LogOut()
             .Finally(() => Scenes.Load("Login"));
     }
-	
+
     public void OnGameItemClick(int roomId) {
         NetWrapper.Instance
             .JoinRoom(new JoinRoomRequest(roomId, "", NetWrapper.Instance.LastJoinedRoom.Id))

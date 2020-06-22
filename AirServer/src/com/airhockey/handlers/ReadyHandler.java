@@ -19,6 +19,6 @@ public class ReadyHandler extends BaseClientRequestHandler {
                 + " lastJoinedroom : " + lastJoinedRoom.getName() + "," + lastJoinedRoom.getSize());
         if(lastJoinedRoom.getSize().getUserCount() == 2)
             airHockeyRoomExtension
-                    .startGame(lastJoinedRoom.getUserList().get(0), lastJoinedRoom.getUserList().get(1));
+                    .startGame(lastJoinedRoom);
     }
 }

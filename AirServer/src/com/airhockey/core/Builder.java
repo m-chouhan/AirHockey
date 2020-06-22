@@ -87,7 +87,7 @@ public class Builder {
 
         Puck circle = new Puck();
         circle.addFixture(Geometry.createCircle(scale/2));
-        circle.setMass(NORMAL);
+        circle.setMass(FIXED_ANGULAR_VELOCITY);
         //circle.setAngularDamping(1f);
         //circle.getFixture(0).setRestitution(1f);
         circle.setAutoSleepingEnabled(false);

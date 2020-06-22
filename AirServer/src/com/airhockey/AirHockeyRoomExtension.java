@@ -4,16 +4,15 @@ import com.airhockey.core.Core;
 import com.airhockey.entities.GameState;
 import com.airhockey.entities.Player;
 import com.airhockey.handlers.MovementHandler;
-import com.airhockey.handlers.ReadyHandler;
 import com.airhockey.handlers.RoomEventHandler;
 import com.smartfoxserver.v2.SmartFoxServer;
 import com.smartfoxserver.v2.core.SFSEventType;
+import com.smartfoxserver.v2.entities.Room;
 import com.smartfoxserver.v2.entities.User;
 import com.smartfoxserver.v2.entities.data.SFSObject;
 import com.smartfoxserver.v2.extensions.SFSExtension;
 import org.dyn4j.dynamics.Body;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -26,26 +25,31 @@ public class AirHockeyRoomExtension extends SFSExtension implements ApplicationW
 
     @Override
     public void init() {
-        trace("[AirHockeyRoomExt] init");
-        this.addRequestHandler("ready", ReadyHandler.class);
+        trace("[AirHockeyRoomExt] init" + getParentRoom().getName());
         this.addRequestHandler("move", MovementHandler.class);
+        this.addRequestHandler("ready", RoomEventHandler.class);
         addEventHandler(SFSEventType.USER_JOIN_ROOM, RoomEventHandler.class);
         addEventHandler(SFSEventType.USER_LEAVE_ROOM, RoomEventHandler.class);
         addEventHandler(SFSEventType.USER_DISCONNECT, RoomEventHandler.class);
+        addEventHandler(SFSEventType.USER_RECONNECTION_TRY, RoomEventHandler.class);
+        addEventHandler(SFSEventType.USER_RECONNECTION_SUCCESS, RoomEventHandler.class);
+        addEventHandler(SFSEventType.ROOM_VARIABLES_UPDATE, RoomEventHandler.class);
+
         sfs = SmartFoxServer.getInstance();
     }
 
-    public void startGame(User user1, User user2) {
+    public void startGame(Room room) {
 
-        trace("[AirHockeyRoomExtension] starting game for " + getParentRoom().getName());
-        Player player1 = new Player(user1.getId());
-        Player player2 = new Player(user2.getId());
-        game = new Core(this, player1, player2, 5);
+        trace("[AirHockeyRoomExtension] starting game for " + room.getName());
+        List<User> list = room.getUserList();
+        Player player1 = new Player(list.get(0).getId());
+        Player player2 = new Player(list.get(1).getId());
+        game = new Core(this, player1, player2, 3);
 
         SFSObject sfsObject = game.getState().toNetworkObj();
 
-        send("start", sfsObject, user1);
-        send("start", sfsObject, user2);
+        send("start", sfsObject, list);
+        //send("start", sfsObject, user2);
         // Schedule task: executes the game logic on the same frame basis (25 fps) used by the Flash client
         gameTask = sfs.getTaskScheduler().scheduleAtFixedRate(game, 100, 10, TimeUnit.MILLISECONDS);
     }
@@ -55,7 +59,7 @@ public class AirHockeyRoomExtension extends SFSExtension implements ApplicationW
     @Override
     public void destroy()
     {
-        trace("[AirHockeyRoomExt] on destroy called " + gameTask);
+        trace("[AirHockeyRoomExt] on destroy called on " + getParentRoom().getName());
         if(gameTask != null)
             gameTask.cancel(true);
         gameTask = null;
@@ -91,20 +95,20 @@ public class AirHockeyRoomExtension extends SFSExtension implements ApplicationW
 
         //update player1 iff
         if(state.player2.isDirty() || state.puck.isDirty()) {
-                SFSObject playerPos = new SFSObject();
-                playerPos.putFloat("x", (float) state.player2.slave.getTransform().getTranslationX());
-                playerPos.putFloat("y", (float) state.player2.slave.getTransform().getTranslationY());
-                resp.putSFSObject(String.valueOf(state.player2.id), playerPos);
-                send("move", resp, player1);
-                resp.removeElement(String.valueOf(state.player2.id));
+            SFSObject playerPos = new SFSObject();
+            playerPos.putFloat("x", (float) state.player2.slave.getTransform().getTranslationX());
+            playerPos.putFloat("y", (float) state.player2.slave.getTransform().getTranslationY());
+            resp.putSFSObject(String.valueOf(state.player2.id), playerPos);
+            send("move", resp, player1);
+            resp.removeElement(String.valueOf(state.player2.id));
         }
         //update player2 iff
         if(state.player1.isDirty() || state.puck.isDirty()) {
-                SFSObject playerPos = new SFSObject();
-                playerPos.putFloat("x", (float) state.player1.slave.getTransform().getTranslationX());
-                playerPos.putFloat("y", (float) state.player1.slave.getTransform().getTranslationY());
-                resp.putSFSObject(String.valueOf(state.player1.id), playerPos);
-                send("move", resp, player2);
+            SFSObject playerPos = new SFSObject();
+            playerPos.putFloat("x", (float) state.player1.slave.getTransform().getTranslationX());
+            playerPos.putFloat("y", (float) state.player1.slave.getTransform().getTranslationY());
+            resp.putSFSObject(String.valueOf(state.player1.id), playerPos);
+            send("move", resp, player2);
         }
     }
 
@@ -112,7 +116,7 @@ public class AirHockeyRoomExtension extends SFSExtension implements ApplicationW
     @Override
     public void endGame(Player winner) {
         SFSObject response = new SFSObject();
-        response.putInt("id", winner.id);
+        response.putInt("won", winner.id);
         send("end", response, getParentRoom().getUserList());
     }
 

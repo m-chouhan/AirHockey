@@ -8,6 +8,8 @@ import org.dyn4j.dynamics.Body;
  * basically our Game is F of (class Game)
  */
 public class GameState implements NetworkInterface {
+    public enum State {WAITING, RUNNING, PAUSE, FINISHED};
+
     public Player player1, player2;
     public Puck puck;
 

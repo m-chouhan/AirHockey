@@ -58,13 +58,27 @@ public class NetWrapper : MonoBehaviour
         }
     }
 
+    private static Subject<T> CreateSubject<T>(string msg) {
+        Subject<T> subject = new Subject<T>();
+        Instance.sfs.RemoveAllEventListeners();
+        subject.Finally(() =>
+        {
+            Debug.Log("cleanup : " + msg);
+            Instance.sfs.RemoveAllEventListeners();
+        });
+        return subject;
+    }
+
+    //connect->login->udpinit
     public IObservable<string> Login(string username)
     {
-        Subject<string> loginStream = new Subject<string>();
-        ConfigData cfg = new ConfigData();
-        cfg.Host = Host;
-        cfg.Port = TcpPort;
-        cfg.Zone = Zone;
+        Subject<string> loginStream = CreateSubject<string>("Login");
+        ConfigData cfg = new ConfigData
+        {
+            Host = Host,
+            Port = TcpPort,
+            Zone = Zone
+        };
         sfs.AddEventListener(SFSEvent.CONNECTION, 
             (evt) => {
                 if ((bool)evt.Params["success"])
@@ -101,37 +115,29 @@ public class NetWrapper : MonoBehaviour
         });
         // Connect to SFS2X
         sfs.Connect(cfg);
-        loginStream.Finally(() => {
-            sfs.RemoveAllEventListeners();
-            Debug.Log("Finally (login) clean up");
-        });
 
         return loginStream.AsObservable();
     }
 
     public IObservable<string> LogOut() {
-        Subject<string> subject = new Subject<string>();
+        Subject<string> subject = CreateSubject<string>("Logout");
         sfs.AddEventListener(SFSEvent.LOGOUT, ev => subject.OnCompleted());
         sfs.Send(new LogoutRequest());
-        subject.Finally(() => {
-            sfs.RemoveAllEventListeners();
-            Debug.Log("Finally (logout) cleanup");
-        });
         return subject.AsObservable();
     }
 
     public IObservable<Room> CreateRoom(string roomName)
     {
-        Subject<Room> subject = new Subject<Room>();
+        Subject<Room> subject = CreateSubject<Room>("create room");
         // Configure Game Room
-        RoomSettings settings = new RoomSettings(roomName)
-        {
-            GroupId = "default",
-            IsGame = true,
-            MaxUsers = 2,
-            MaxSpectators = 0,
-            Extension = new RoomExtension(EXTENSION_ID, EXTENSION_CLASS)
-        };
+        RoomSettings settings = new RoomSettings(roomName);
+        //{
+        settings.GroupId = "default";
+        settings.IsGame = true;
+        settings.MaxUsers = 2;
+        settings.MaxSpectators = 0;
+        settings.Extension = new RoomExtension(EXTENSION_ID, EXTENSION_CLASS);
+        //};
 
         sfs.AddEventListener(SFSEvent.ROOM_JOIN, 
             ev => {
@@ -144,16 +150,12 @@ public class NetWrapper : MonoBehaviour
             ev => subject.OnError(new Exception((string)ev.Params["errorMessage"])));
         // create room request and leave previous room post join
         sfs.Send(new CreateRoomRequest(settings, true, sfs.LastJoinedRoom));
-        subject.Finally(() => {
-            sfs.RemoveAllEventListeners();
-            Debug.Log("Finally (create room) cleanup");
-        });
         return subject.AsObservable();
     }
 
     public IObservable<Room> JoinRoom(JoinRoomRequest request)
     {
-        Subject<Room> subject = new Subject<Room>();
+        Subject<Room> subject = CreateSubject<Room>("Join room");
         sfs.AddEventListener(SFSEvent.ROOM_JOIN,
             ev => {
                 subject.OnNext((Room)ev.Params["room"]);
@@ -163,12 +165,7 @@ public class NetWrapper : MonoBehaviour
         sfs.AddEventListener(SFSEvent.ROOM_JOIN_ERROR,
             ev =>
                 subject.OnError(new Exception((string)ev.Params["errorMessage"])));
-
         sfs.Send(request);
-        subject.Finally(() => {
-            sfs.RemoveAllEventListeners();
-            Debug.Log("Finally (join room) cleanup");
-        });
         return subject.AsObservable();
     }
 
@@ -179,27 +176,21 @@ public class NetWrapper : MonoBehaviour
 
     public IObservable<BaseEvent> FetchRoomEvents()
     {
-        Subject<BaseEvent> subject = 
-            new Subject<BaseEvent>();
+        Subject<BaseEvent> subject = CreateSubject<BaseEvent>("room events");
 
         sfs.AddEventListener(SFSEvent.ROOM_ADD, 
             ev => subject.OnNext(ev));
         sfs.AddEventListener(SFSEvent.ROOM_REMOVE,
             ev => subject.OnNext(ev));
-        //sfs.AddEventListener(SFSEvent.USER_ENTER_ROOM, ev => subject.OnNext(ev));
-        //sfs.AddEventListener(SFSEvent.USER_EXIT_ROOM, ev => subject.OnNext(ev));
-        //sfs.AddEventListener(SFSEvent.CONNECTION_LOST, ev => { });
-
-        subject.Finally(() => {
-            sfs.RemoveAllEventListeners();
-            Debug.Log("Finally (join room) cleanup");
-        });
         return subject.AsObservable();
     }
 
     public IObservable<BaseEvent> FetchGameEvents()
     {
-        Subject<BaseEvent> subject = new Subject<BaseEvent>();
+        Subject<BaseEvent> subject = CreateSubject<BaseEvent>("game events");
+        Debug.Log("1 " + LastJoinedRoom.GetVariable("roomvar1"));
+        Debug.Log("2 " + LastJoinedRoom.GetVariable("roomvar2"));
+        Debug.Log("3 " + LastJoinedRoom.GetVariable("roomvar3"));
         sfs.AddEventListener(SFSEvent.EXTENSION_RESPONSE,
             resp => 
             {
@@ -208,9 +199,11 @@ public class NetWrapper : MonoBehaviour
                 {
                     case "start":
                         SFSObject data = (SFSObject) resp.Params["params"];
+                        Debug.Log("[start] received " + data.ToJson());
+
                         string curId = sfs.MySelf.Id.ToString();
                         string [] keys = data.GetKeys();
-                        string otherId = Array.Find(keys, 
+                        string otherId = Array.Find(keys,
                                 key => !key.Equals("puck") && !key.Equals(curId));
 
                         ISFSObject curData = data.GetSFSObject(curId);
@@ -226,6 +219,43 @@ public class NetWrapper : MonoBehaviour
                 if (cmd.Equals("end")) subject.OnCompleted();
             }
         );
+
+        sfs.AddEventListener(SFSEvent.ROOM_VARIABLES_UPDATE, ev =>
+        {
+            Debug.Log(ev.Params["params"]);
+        });
+
+        sfs.AddEventListener(SFSEvent.CONNECTION_LOST, ev => {
+            Debug.Log("connection lost!!");
+            //TODO : pause game and retry connection
+        });
+
+        sfs.AddEventListener(SFSEvent.CONNECTION_RETRY, ev => {
+            Debug.Log("retrying connection!!");
+            //TODO : pause game and retry connection
+        });
+
+        sfs.AddEventListener(SFSEvent.CONNECTION_RESUME, ev => {
+            Debug.Log("resume connection!!");
+            //TODO : pause game and retry connection
+        });
+
+        sfs.AddEventListener(SFSEvent.USER_ENTER_ROOM, ev => {
+            User user = (User)ev.Params["user"];
+            Room room = (Room)ev.Params["room"];
+            Debug.Log(user.Name + " entered the room " + room.Name);
+        });
+
+        sfs.AddEventListener(SFSEvent.USER_EXIT_ROOM, ev => {
+            Dictionary<string, object> param = new Dictionary<string,object>();
+            param.Add("cmd", "userExit");
+            subject.OnNext(new BaseEvent(SFSEvent.USER_EXIT_ROOM, param));
+
+            User user = (User)ev.Params["user"];
+            Room room = (Room)ev.Params["room"];
+            Debug.Log(user.Name + " exited the room " + room.Name);
+            subject.OnCompleted();
+        });
 
         return subject.AsObservable();
     }
