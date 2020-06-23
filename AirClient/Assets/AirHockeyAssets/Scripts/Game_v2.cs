@@ -14,7 +14,6 @@ public class Game_v2 : MonoBehaviour
     void Awake()
     {
         Application.runInBackground = true;
-
         switch (Scenes.getParam("Mode"))
         {
             case "Multiplayer-Online":
