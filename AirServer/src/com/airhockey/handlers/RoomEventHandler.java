@@ -26,23 +26,11 @@ public class RoomEventHandler extends BaseClientRequestHandler implements IServe
         trace("Player : " + user.getId() + " is ready "
                 + " parentRoomName : " + parentRoom.getName() +","+ parentRoom.getSize()
                 + " lastJoinedroom : " + lastJoinedRoom.getName() + "," + lastJoinedRoom.getSize());
-        setupRoomVariables(lastJoinedRoom);
+        //setupRoomVariables(lastJoinedRoom);
 
         if(lastJoinedRoom.getUserList().size() == 2)
             airHockeyRoomExtension
                     .startGame(lastJoinedRoom);
-    }
-
-    private void setupRoomVariables(Room room)
-    {
-        // Private Global Room variable, no one will be able to overwrite this value
-        // The topic will be visible from outside the Room
-        RoomVariable gameStvar = new SFSRoomVariable("roomvar1", "WAITING");
-        RoomVariable gameStvar2 = new SFSRoomVariable("roomvar2", 100);
-        RoomVariable gameStvar3 = new SFSRoomVariable("roomvar3", GameState.State.PAUSE.toString());
-        // Set variables via the server side API
-        // Passing null as the User parameter sets the ownership of the variables to the Server itself
-        getApi().setRoomVariables(null, room, Arrays.asList(gameStvar, gameStvar2, gameStvar3));
     }
 
     @Override

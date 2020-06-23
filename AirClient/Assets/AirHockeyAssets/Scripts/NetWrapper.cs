@@ -222,6 +222,7 @@ public class NetWrapper : MonoBehaviour
 
         sfs.AddEventListener(SFSEvent.ROOM_VARIABLES_UPDATE, ev =>
         {
+            Debug.Log("Room var update");
             Debug.Log(ev.Params["params"]);
         });
 

@@ -10,9 +10,12 @@ import com.smartfoxserver.v2.core.SFSEventType;
 import com.smartfoxserver.v2.entities.Room;
 import com.smartfoxserver.v2.entities.User;
 import com.smartfoxserver.v2.entities.data.SFSObject;
+import com.smartfoxserver.v2.entities.variables.RoomVariable;
+import com.smartfoxserver.v2.entities.variables.SFSRoomVariable;
 import com.smartfoxserver.v2.extensions.SFSExtension;
 import org.dyn4j.dynamics.Body;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -48,7 +51,14 @@ public class AirHockeyRoomExtension extends SFSExtension implements ApplicationW
 
         SFSObject sfsObject = game.getState().toNetworkObj();
 
-        send("start", sfsObject, list);
+        RoomVariable gameStvar = new SFSRoomVariable("state", "WAITING");
+        RoomVariable gameStvar2 = new SFSRoomVariable("roomvar2", 100);
+        RoomVariable gameStvar3 = new SFSRoomVariable("roomvar3", GameState.State.PAUSE.toString());
+        // Set variables via the server side API
+        // Passing null as the User parameter sets the ownership of the variables to the Server itself
+        getApi().setRoomVariables(null, room, Arrays.asList(gameStvar, gameStvar2, gameStvar3));
+
+        //send("start", sfsObject, list);
         //send("start", sfsObject, user2);
         // Schedule task: executes the game logic on the same frame basis (25 fps) used by the Flash client
         gameTask = sfs.getTaskScheduler().scheduleAtFixedRate(game, 100, 10, TimeUnit.MILLISECONDS);
