@@ -14,7 +14,7 @@ public class NetWrapper : MonoBehaviour
     public static bool IsInitialized = false;
     public static NetWrapper Instance;
 
-    private string Host = "52.66.195.155";
+    private string Host = "13.235.113.99";
     private int TcpPort = 9933;
     private int UdpPort = 9934;
     private string Zone = "AirHockey";
@@ -188,9 +188,9 @@ public class NetWrapper : MonoBehaviour
     public IObservable<BaseEvent> FetchGameEvents()
     {
         Subject<BaseEvent> subject = CreateSubject<BaseEvent>("game events");
-        Debug.Log("1 " + LastJoinedRoom.GetVariable("roomvar1"));
-        Debug.Log("2 " + LastJoinedRoom.GetVariable("roomvar2"));
-        Debug.Log("3 " + LastJoinedRoom.GetVariable("roomvar3"));
+        // Debug.Log("1 " + LastJoinedRoom.GetVariable("roomvar1"));
+        // Debug.Log("2 " + LastJoinedRoom.GetVariable("roomvar2"));
+        // Debug.Log("3 " + LastJoinedRoom.GetVariable("roomvar3"));
         sfs.AddEventListener(SFSEvent.EXTENSION_RESPONSE,
             resp => 
             {
@@ -213,7 +213,7 @@ public class NetWrapper : MonoBehaviour
                         data.RemoveElement(curId);
                         data.RemoveElement(otherId);
                         Debug.Log("[start] updated data is " + data.ToJson());
-                        break;                    
+                        break;
                 }
                 subject.OnNext(resp);
                 if (cmd.Equals("end")) subject.OnCompleted();
@@ -222,8 +222,10 @@ public class NetWrapper : MonoBehaviour
 
         sfs.AddEventListener(SFSEvent.ROOM_VARIABLES_UPDATE, ev =>
         {
-            Debug.Log("Room var update");
-            Debug.Log(ev.Params["params"]);
+            Debug.Log("Room var updated");
+            List<String> list = (List<string>)ev.Params["changedVars"];
+            foreach(String item in list)
+                Debug.Log(item);
         });
 
         sfs.AddEventListener(SFSEvent.CONNECTION_LOST, ev => {
