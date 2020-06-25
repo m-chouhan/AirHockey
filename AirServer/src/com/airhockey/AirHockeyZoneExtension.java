@@ -1,5 +1,6 @@
 package com.airhockey;
 
+import com.airhockey.core.Builder;
 import com.airhockey.handlers.RoomEventHandler;
 import com.airhockey.handlers.ZoneEventHandler;
 import com.smartfoxserver.v2.core.SFSEventType;
@@ -11,5 +12,6 @@ public class AirHockeyZoneExtension extends SFSExtension {
     public void init() {
         trace("[AirHockeyZoneExt] init!!");
         addEventHandler(SFSEventType.USER_JOIN_ZONE, ZoneEventHandler.class);
+        addEventHandler(SFSEventType.USER_JOIN_ROOM, ZoneEventHandler.class);
     }
 }

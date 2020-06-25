@@ -14,7 +14,7 @@
     <method v="2">
       <option name="Make" enabled="true" />
       <option name="BuildArtifacts" enabled="true">
-        <artifact name="AirServer:jar" />
+        <artifact name="AirServer:jar2" />
       </option>
       <option name="ToolBeforeRunTask" enabled="true" actionId="Tool_External Tools_upload" />
     </method>
