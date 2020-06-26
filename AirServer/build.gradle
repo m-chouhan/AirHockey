@@ -7,10 +7,13 @@
  */
 
 plugins {
+    id 'com.github.johnrengelman.shadow' version '6.0.0'
     // Apply the java plugin to add support for Java
     id 'java'
     // Apply the application plugin to add support for building a CLI application.
     id 'application'
+    // to print dependencies for a particular task
+    id "com.dorongold.task-tree" version "1.5"
 }
 
 repositories {
@@ -32,10 +35,43 @@ dependencies {
 }
 
 run  {
-    println "running run task"
-    println "-------------"
-    environment "ENV", "TEST"
-    //System.setEnv("ENV", "TEST")
+    doFirst {
+        println "running run task"
+        println "-------------"
+        environment "ENV", "TEST"
+    }
+}
+
+shadowJar {
+    manifest {
+        attributes 'Implementation-Title': 'AirHockey Jar File ~ mahendra'
+        //'Main-Class': 'com.mkyong.DateUtils'
+    }
+    baseName = 'AirHockeyExtension'
+    classifier = ''
+}
+
+test {
+    testLogging {
+        events 'PASSED', 'FAILED'
+    }
+}
+
+task signOff {
+    group 'Custom'
+    description 'Cheesy line to end run task with'
+    //dependsOn 'run'
+    doFirst {
+        println "do first singoff!"
+    }
+    doLast {
+        println "Thats all folks"
+    }
+}
+
+task uploadJar (type : Exec) {
+    dependsOn 'shadowJar'
+    commandLine('./upload.sh', 'build/libs/AirHockeyExtension.jar', '13.235.113.99')
 }
 
 sourceSets.main.java.srcDirs = ['src']
