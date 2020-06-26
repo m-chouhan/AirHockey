@@ -10,8 +10,13 @@ public class AirHockeyZoneExtension extends SFSExtension {
 
     @Override
     public void init() {
-        trace("[AirHockeyZoneExt] init!!");
+        trace("[AirHockeyZoneExt] setting up zone event handlers!!");
         addEventHandler(SFSEventType.USER_JOIN_ZONE, ZoneEventHandler.class);
         addEventHandler(SFSEventType.USER_JOIN_ROOM, ZoneEventHandler.class);
+    }
+
+    @Override
+    public void destroy() {
+        trace("[AirHockeyZoneExt] destroying zone event handlers!!");
     }
 }

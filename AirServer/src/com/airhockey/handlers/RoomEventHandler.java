@@ -1,6 +1,7 @@
 package com.airhockey.handlers;
 
 import com.airhockey.AirHockeyRoomExtension;
+import com.airhockey.core.Builder;
 import com.airhockey.entities.GameState;
 import com.smartfoxserver.v2.core.ISFSEvent;
 import com.smartfoxserver.v2.core.SFSEventParam;
@@ -13,6 +14,7 @@ import com.smartfoxserver.v2.entities.variables.SFSRoomVariable;
 import com.smartfoxserver.v2.exceptions.SFSException;
 import com.smartfoxserver.v2.extensions.BaseClientRequestHandler;
 import com.smartfoxserver.v2.extensions.IServerEventHandler;
+import org.dyn4j.dynamics.Body;
 
 import java.util.Arrays;
 
@@ -27,7 +29,7 @@ public class RoomEventHandler extends BaseClientRequestHandler implements IServe
                 + " parentRoomName : " + parentRoom.getName() +","+ parentRoom.getSize()
                 + " lastJoinedroom : " + lastJoinedRoom.getName() + "," + lastJoinedRoom.getSize());
         //setupRoomVariables(lastJoinedRoom);
-
+        Body var = Builder.createObstacle(0,0, 100,100);
         if(lastJoinedRoom.getUserList().size() == 2)
             airHockeyRoomExtension
                     .startGame(lastJoinedRoom);
@@ -40,13 +42,13 @@ public class RoomEventHandler extends BaseClientRequestHandler implements IServe
         switch (evt.getType()) {
             case USER_DISCONNECT:
                 User user = (User)evt.getParameter(SFSEventParam.USER);
-                Room room = (Room)evt.getParameter(SFSEventParam.ROOM);
-                trace(user.getName() + " is disconnected from " + room.getName());
+                String reason = (String) evt.getParameter(SFSEventParam.DISCONNECTION_REASON);
+                trace(user.getName() + " is disconnected " + reason);
                 break;
             case USER_JOIN_ROOM:
                 user = (User) evt.getParameter(SFSEventParam.USER);
                 Zone zone = (Zone) evt.getParameter(SFSEventParam.ZONE);
-                room = (Room) evt.getParameter(SFSEventParam.ROOM);
+                Room room = (Room) evt.getParameter(SFSEventParam.ROOM);
                 trace("[RoomEventHandler] " + user.getName() + "," + zone.getName() + "," + room.getName());
                 break;
             case USER_LEAVE_ROOM:
